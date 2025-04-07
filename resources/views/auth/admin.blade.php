@@ -58,20 +58,15 @@
   <div class="collapse navbar-collapse justify-content-end">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" href="#api-usage"><i class="fas fa-chart-line"></i> API Usage</a>
+        <a class="nav-link" href="{{ route('accounts.index') }}"><i class="fas fa-user"></i> Manage User</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#dataset"><i class="fas fa-image"></i> Quản lý User</a>
+        <a class="nav-link" href="{{ route('api') }}"><i class="fas fa-chart-line"></i> API Usage</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#model-config"><i class="fas fa-cogs"></i> Model & Ngưỡng</a>
+        <a class="nav-link" href="#painting-info"><i class="fas fa-image"></i> Painting Information</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#logs"><i class="fas fa-history"></i> Quản lý thông tin tranh</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#system-info"><i class="fas fa-info-circle"></i> Thông tin hệ thống</a>
-      </li>
+
       <li class="nav-item">
         <form action="{{ route('logout') }}" method="POST">
           @csrf
@@ -86,66 +81,21 @@
 
 <!-- Main Content -->
 <div class="container main-content">
-  <h2 class="mb-4">Bảng điều khiển Quản trị</h2>
-
-  <div class="row">
-    <!-- Card 1: API Usage -->
-    <div class="col-md-6" id="api-usage">
-      <div class="card border-primary">
-        <div class="card-header bg-primary text-white">#1 Quản lý API Usage</div>
-        <div class="card-body">
-          <p>Thống kê số lượt gọi API trong ngày, tháng, người dùng...</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Card 2: Dataset -->
-    <div class="col-md-6" id="dataset">
-      <div class="card border-success">
-        <div class="card-header bg-success text-white">#3 Quản lý User</div>
-        <div class="card-body">
-          <p>Danh sách người dùng, vai trò, trạng thái tài khoản, và các thao tác quản lý như thêm, sửa, xóa người dùng...</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Card 3: Model config -->
-    <div class="col-md-6" id="model-config">
-      <div class="card border-warning">
-        <div class="card-header bg-warning text-dark">#4 Cấu hình Model & Ngưỡng</div>
-        <div class="card-body">
-          <p>Đang dùng model: <strong>DINOv2</strong>, ngưỡng similarity: <strong>0.80</strong></p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Card 4: Logs -->
-    <div class="col-md-6" id="logs">
-      <div class="card border-danger">
-        <div class="card-header bg-danger text-white">#5 Quản lý thông tin tranh</div>
-        <div class="card-body">
-        <p>Danh sách các tranh đã nhận diện, trạng thái xử lý, thông tin tác giả, năm sáng tác, và các truy vấn gần đây liên quan đến tranh.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Card 5: System Info -->
-    <div class="col-md-12" id="system-info">
-      <div class="card border-dark">
-        <div class="card-header bg-dark text-white">#7 Thông tin hệ thống</div>
-        <div class="card-body">
-          <p>Phiên bản: v1.0.0 | RAM: 16GB | CPU: 8-core | Tải trung bình: 15%</p>
-        </div>
-      </div>
-    </div>
-
-  </div>
+  
 </div>
 
 <!-- Footer -->
 <div class="footer mt-4">
   <p>© 2025 Hệ Thống Nhận Diện Tranh - Admin</p>
+  <p><i class="fas fa-info-circle"></i> Thông tin hệ thống:</p>
+  <ul>
+    <li><strong>Phiên bản:</strong> 1.0</li>
+    <li><strong>Ngày phát hành:</strong> Tháng 5, 2025</li>
+    <li><strong>API:</strong> RESTful API, các endpoint chính: <code>/predict</code></li>
+    <li><strong>Liên kết tài liệu API:</strong> <a href="https://yourdomain.com/api-docs" target="_blank">Xem tài liệu API</a></li>
+  </ul>
 </div>
+
 
 </body>
 </html>

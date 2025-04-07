@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Http\Controllers\Controller;
+use App\Models\ApiUsageSummary;  // Import Model ApiUsageSummary
 
 class PaintingController extends Controller
 {
@@ -45,6 +46,16 @@ class PaintingController extends Controller
                 // Nhận kết quả trả về từ Flask API
                 $data = json_decode($response->getBody()->getContents(), true);
 
+                // Ghi lại thông tin vào bảng api_usage_summary
+                $accountId = auth()->id();  // Lấy account_id của người dùng
+                $endpoint = '/predict';  // Đường dẫn API được gọi
+
+                // Cập nhật hoặc tạo mới bản ghi cho việc gọi API
+                ApiUsageSummary::updateOrCreate(
+                    ['account_id' => $accountId, 'endpoint' => $endpoint],
+                    ['call_count' => \DB::raw('call_count + 1'), 'last_called_at' => now()]
+                );
+
                 // Trả về kết quả cho người dùng
                 return response()->json($data);
             }
@@ -53,3 +64,4 @@ class PaintingController extends Controller
         }
     }
 }
+
