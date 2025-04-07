@@ -39,7 +39,7 @@ class LoginController extends Controller
             }
 
             // Nếu là người dùng bình thường
-            return redirect()->route('home')->with('message', 'Đăng nhập thành công!');
+            return redirect()->route('predict')->with('message', 'Đăng nhập thành công!');
         }
 
         return back()->withErrors(['error' => 'Tên đăng nhập hoặc mật khẩu không chính xác, vui lòng nhập lại']);

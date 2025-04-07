@@ -64,7 +64,7 @@
         <a class="nav-link" href="{{ route('api') }}"><i class="fas fa-chart-line"></i> API Usage</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#painting-info"><i class="fas fa-image"></i> Painting Information</a>
+        <a class="nav-link" href="{{ route('paintings.index') }}"><i class="fas fa-image"></i> Painting Information</a>
       </li>
 
       <li class="nav-item">

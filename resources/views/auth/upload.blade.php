@@ -198,9 +198,20 @@
                     resultContainer.innerHTML = `<p style="color: red;">${data.error}</p>`;
                     return;
                 }
-
+                // Nếu dữ liệu từ Dataset Cosine có thông tin
+                if (data.source === "Dataset Cosine") {
+                    const result = `
+                        <h3>Tên Tranh: ${data.info.painting_title}</h3>
+                        <p><strong>Tác giả:</strong> ${data.info.artist}</p>
+                        <p><strong>Nhiếp ảnh:</strong> ${data.info.photographer}</p>
+                        <p><strong>Phong cách:</strong> ${data.info.style}</p>
+                        <p><strong>Độ tương đồng:</strong> ${data.info.similarity}</p>
+                        <p><strong>Mô tả:</strong> ${data.info.description || "Không có mô tả."}</p>
+                    `;
+                    resultContainer.innerHTML = result;
+                }
                 // Nếu dữ liệu từ Google Image và Gemini có thông tin
-                if (data.source === "Google Image") {
+                else if (data.source === "Google Image") {
                     const geminiInfo = data.gemini_info;
 
                     // Tạo mô tả chi tiết nếu không có thông tin hợp lệ

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Http\Controllers\Controller;
-use App\Models\ApiUsageSummary;  // Import Model ApiUsageSummary
+use App\Models\ApiUsageSummary;
 
 class PaintingController extends Controller
 {
@@ -47,14 +47,27 @@ class PaintingController extends Controller
                 $data = json_decode($response->getBody()->getContents(), true);
 
                 // Ghi lại thông tin vào bảng api_usage_summary
-                $accountId = auth()->id();  // Lấy account_id của người dùng
-                $endpoint = '/predict';  // Đường dẫn API được gọi
+                $accountId = auth()->id();
+                $endpoint = '/predict';
 
-                // Cập nhật hoặc tạo mới bản ghi cho việc gọi API
-                ApiUsageSummary::updateOrCreate(
-                    ['account_id' => $accountId, 'endpoint' => $endpoint],
-                    ['call_count' => \DB::raw('call_count + 1'), 'last_called_at' => now()]
-                );
+                // Tìm bản ghi hiện tại
+                $record = ApiUsageSummary::where('account_id', $accountId)
+                    ->where('endpoint', $endpoint)
+                    ->first();
+
+                if ($record) {
+                    // Nếu đã tồn tại thì tăng call_count
+                    $record->increment('call_count');
+                    $record->update(['last_called_at' => now()]);
+                } else {
+                    // Nếu chưa tồn tại thì tạo mới với call_count = 1
+                    ApiUsageSummary::create([
+                        'account_id' => $accountId,
+                        'endpoint' => $endpoint,
+                        'call_count' => 1,
+                        'last_called_at' => now()
+                    ]);
+                }
 
                 // Trả về kết quả cho người dùng
                 return response()->json($data);

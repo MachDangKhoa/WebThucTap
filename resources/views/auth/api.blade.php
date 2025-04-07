@@ -48,7 +48,6 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Account ID</th>
                             <th>Endpoint</th>
                             <th>Call Count</th>
@@ -59,14 +58,13 @@
                     <tbody>
                         @foreach($apiUsages as $apiUsage)
                             <tr>
-                                <td>{{ $apiUsage->id }}</td>
                                 <td>{{ $apiUsage->account_id }}</td>
                                 <td>{{ $apiUsage->endpoint }}</td>
                                 <td>{{ $apiUsage->call_count }}</td>
                                 <td>{{ $apiUsage->last_called_at }}</td>
                                 <td>
-                                    <a href="{{ route('api.edit', $apiUsage->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                    <form action="{{ route('api.delete', $apiUsage->id) }}" method="POST" style="display:inline;">
+                                    <a href="{{ route('api.edit_api', $apiUsage->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                    <form action="{{ route('api.destroy_api', $apiUsage->id) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>

@@ -16,10 +16,45 @@ class ApiUsageController extends Controller
         return view('auth.api', compact('apiUsages')); // Trả về view với danh sách API usages
     }
 
+    // Hiển thị form chỉnh sửa API
+    public function edit_api($id)
+    {
+        $apiUsage = ApiUsageSummary::find($id);
+        return view('auth.api_edit', compact('apiUsage')); // Trả về view với dữ liệu cần chỉnh sửa
+    }
+
+    // Xử lý cập nhật dữ liệu API
+    public function update_api(Request $request, $id)
+    {
+        // Validate dữ liệu từ form
+        $request->validate([
+            'endpoint' => 'required|string',
+            'call_count' => 'required|integer',
+        ]);
+
+        // Tìm kiếm API Usage theo ID
+        $apiUsage = ApiUsageSummary::find($id);
+
+        // Cập nhật dữ liệu
+        $apiUsage->endpoint = $request->input('endpoint');
+        $apiUsage->call_count = $request->input('call_count');
+        $apiUsage->last_called_at = now(); // Cập nhật thời gian
+        $apiUsage->save(); // Lưu lại thay đổi
+
+        // Redirect về trang chỉnh sửa với thông báo thành công
+        return redirect()->route('api', $apiUsage->id)->with('success', 'Account updated successfully!');
+    }
+
+    public function destroy_api($id)
+    {
+        $account = ApiUsageSummary::find($id);
+        $account->delete();
+        return redirect()->route('api')->with('success', 'Account deleted successfully');
+    }
+
     // Lấy thống kê số lượt gọi API theo thời gian (ngày, tuần, tháng)
     public function getApiUsage(Request $request)
     {
-        return view('auth.api_statistics'); // Trả về view thống kê API usage
         $timePeriod = $request->input('time_period', 'day');
         $startDate = Carbon::now();
 
@@ -37,60 +72,20 @@ class ApiUsageController extends Controller
             ->orderBy('date', 'desc')
             ->get();
 
-        return response()->json($apiUsageStats);
+        return view('auth.api_statistics', compact('apiUsageStats'));
     }
 
     // Lấy top users gọi API nhiều nhất
     public function getTopUsers(Request $request)
     {
-        return view('auth.api_top_users'); // Trả về view với danh sách top users
         $topUsers = ApiUsageSummary::select('account_id', \DB::raw('SUM(call_count) as total_calls'))
             ->groupBy('account_id')
             ->orderBy('total_calls', 'desc')
             ->limit(10) // Lấy 10 user gọi nhiều nhất
             ->get();
 
-        return response()->json($topUsers);
+        return view('auth.api_top_users', compact('topUsers'));
     }
 
-    // Sửa thông tin API Usage
-    public function editApiUsage($id)
-    {
-        $apiUsage = ApiUsageSummary::find($id);
-        if (!$apiUsage) {
-            return redirect()->route('api')->with('error', 'API Usage not found.');
-        }
-
-        return view('auth.edit_api_usage', compact('apiUsage')); // Trả về view sửa API usage
-    }
-
-    // Cập nhật thông tin API Usage
-    public function updateApiUsage(Request $request, $id)
-    {
-        $apiUsage = ApiUsageSummary::find($id);
-
-        if (!$apiUsage) {
-            return redirect()->route('api')->with('error', 'API Usage not found.');
-        }
-
-        // Cập nhật thông tin
-        $apiUsage->update($request->all());
-
-        return redirect()->route('api')->with('success', 'API Usage updated successfully.');
-    }
-
-    // Xóa thông tin API Usage
-    public function deleteApiUsage($id)
-    {
-        $apiUsage = ApiUsageSummary::find($id);
-
-        if (!$apiUsage) {
-            return redirect()->route('api')->with('error', 'API Usage not found.');
-        }
-
-        $apiUsage->delete();
-
-        return redirect()->route('api')->with('success', 'API Usage deleted successfully.');
-    }
 }
 

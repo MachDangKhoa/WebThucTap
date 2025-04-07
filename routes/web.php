@@ -6,7 +6,7 @@ use App\Http\Controllers\Auth\PaintingController;
 use App\Http\Controllers\Auth\AdminController;
 use App\Http\Controllers\Auth\ApiUsageController;
 use App\Http\Controllers\Auth\AccountsController;
-
+use App\Http\Controllers\Auth\PaintController;
 
 // Route login/register
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -23,6 +23,12 @@ Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard')
 
 // // Route cho API Usage
 Route::get('/admin/api', [ApiUsageController::class, 'showApiUsage'])->name('api');
+
+Route::get('/admin/api/edit_api/{id}', [ApiUsageController::class, 'edit_api'])->name('api.edit_api');
+Route::put('/admin/api/update_api/{id}', [ApiUsageController::class, 'update_api'])->name('api.update_api');
+
+Route::delete('/admin/api/{id}', [ApiUsageController::class, 'destroy_api'])->name('api.destroy_api');
+
 Route::get('/admin/api_statistics', [ApiUsageController::class, 'getApiUsage'])->name('api_statistics');
 Route::get('/admin/top-users', [ApiUsageController::class, 'getTopUsers'])->name('api.top-users');
 
@@ -36,5 +42,15 @@ Route::put('/admin/accounts/{id}', [AccountsController::class, 'update'])->name(
 // Route để xóa tài khoản
 Route::delete('/admin/accounts/{id}', [AccountsController::class, 'destroy'])->name('accounts.destroy');
 
+Route::get('/paintings', [PaintController::class, 'index'])->name('paintings.index');
+
+Route::get('/paintings/edit_db/{id}', [PaintController::class, 'edit_db'])->name('painting.edit_db');
+Route::put('/paintings/update_db/{id}', [PaintController::class, 'update_db'])->name('painting_db.update');
+Route::delete('/paintings/destroy_db/{id}', [PaintController::class, 'destroy_db'])->name('painting.destroy_db');
+
+Route::get('/paintings/edit_gg/{id}', [PaintController::class, 'edit_google'])->name('painting.edit_gg');
+Route::put('/paintinggoogle/update_gg/{id}', [PaintController::class, 'update_google'])->name('painting_gg.update');
+Route::delete('/paintings/destroy_gg/{id}', [PaintController::class, 'destroy_google'])->name('painting.destroy_gg');
+
 // Route API với middleware auth cho predict
-Route::match(['get', 'post'], '/predict', [PaintingController::class, 'predict'])->middleware('auth');
+Route::match(['get', 'post'], '/predict', [PaintingController::class, 'predict'])->middleware('auth')->name('predict');

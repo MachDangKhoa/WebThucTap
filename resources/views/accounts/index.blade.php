@@ -9,7 +9,7 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
-        <a class="navbar-brand" href="{{ route('admin.dashboard') }}">🎨 Admin xAccounts</a>
+        <a class="navbar-brand" href="{{ route('admin.dashboard') }}">🎨 Admin Accounts</a>
         <div class="collapse navbar-collapse justify-content-end">
             <ul class="navbar-nav">
                 <li class="nav-item">
