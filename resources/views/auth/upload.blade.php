@@ -217,13 +217,14 @@
                     // Tạo mô tả chi tiết nếu không có thông tin hợp lệ
                     const detailedDescription = `
                         Thông tin về bức tranh:\n
-                        1. Tên nghệ sĩ: ${geminiInfo.artist || 'Không có thông tin'}\n
-                        2. Phong cách và đặc điểm nghệ thuật: ${geminiInfo.style || 'Không có thông tin'}\n
-                        3. Thể loại: ${geminiInfo.genre || 'Không có thông tin'}\n
-                        4. Năm sáng tác: ${geminiInfo.year || 'Không rõ'}\n
-                        5. Mô tả: ${geminiInfo.description || 'Không có mô tả'}\n
-                        6. Các đặc điểm nghệ thuật nổi bật: ${geminiInfo.artistic_features || 'Không có thông tin'}\n
-                        7. Thông tin bổ sung: ${geminiInfo.additional_info || 'Không có thông tin'}
+                        1. Tên bức tranh: ${geminiInfo.title || 'Không có thông tin'}\n
+                        2. Tên nghệ sĩ: ${geminiInfo.artist || 'Không có thông tin'}\n
+                        3. Phong cách và đặc điểm nghệ thuật: ${geminiInfo.style || 'Không có thông tin'}\n
+                        4. Thể loại: ${geminiInfo.genre || 'Không có thông tin'}\n
+                        5. Năm sáng tác: ${geminiInfo.year || 'Không rõ'}\n
+                        6. Mô tả: ${geminiInfo.description || 'Không có mô tả'}\n
+                        7. Các đặc điểm nghệ thuật nổi bật: ${geminiInfo.artistic_features || 'Không có thông tin'}\n
+                        8. Thông tin bổ sung: ${geminiInfo.additional_info || 'Không có thông tin'}
                     `;
 
                     // Kiểm tra nếu tất cả các trường đều là "Không có thông tin"
@@ -232,6 +233,7 @@
                     } else {
                         const result = `
                             <h3>Thông tin từ tìm kiếm Google:</h3>
+                            <p><strong>Tên bức tranh:</strong> ${geminiInfo.title || 'Không có thông tin'}</p>
                             <p><strong>Tên nghệ sĩ:</strong> ${geminiInfo.artist || 'Không có thông tin'}</p>
                             <p><strong>Phong cách:</strong> ${geminiInfo.style || 'Không có thông tin'}</p>
                             <p><strong>Thể loại:</strong> ${geminiInfo.genre || 'Không có thông tin'}</p>

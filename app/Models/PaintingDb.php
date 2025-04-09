@@ -11,5 +11,14 @@ class PaintingDb extends Model
 
     protected $table = 'painting_db';
     protected $primaryKey = 'id_db';
+    protected $fillable = [
+        'painting_title',
+        'artist_db',
+        'style_db',
+        'photographer',
+        'similarity',
+        'description',
+        'img_url_db',
+    ];
     public $timestamps = false;  // Assuming no timestamps in the table
 }

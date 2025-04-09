@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Http\Controllers\Controller;
+use App\Models\PaintingDb;  // Model cho bảng painting_db
+use App\Models\PaintingGoogle;  // Model cho bảng painting_google
 use App\Models\ApiUsageSummary;
+use Illuminate\Support\Facades\Storage;
 
 class PaintingController extends Controller
 {
@@ -40,7 +43,8 @@ class PaintingController extends Controller
                             'contents' => fopen($image->getRealPath(), 'r'),
                             'filename' => $image->getClientOriginalName()
                         ]
-                    ]
+                    ],
+                        'timeout' => 9999,
                 ]);
 
                 // Nhận kết quả trả về từ Flask API
@@ -69,6 +73,37 @@ class PaintingController extends Controller
                     ]);
                 }
 
+                // Lưu hình ảnh vào thư mục public/uploads và tạo URL
+                $imagePath = $image->store('uploads', 'public');
+                $imageUrl = Storage::url($imagePath);
+
+                // Lưu thông tin vào bảng tương ứng
+                if ($data['source'] === 'Dataset Cosine') {
+                    // Lưu vào bảng painting_db
+                    PaintingDb::create([
+                        'painting_title' => $data['info']['painting_title'],
+                        'artist_db' => $data['info']['artist'],
+                        'style_db' => $data['info']['style'],
+                        'photographer' => $data['info']['photographer'],
+                        'similarity' => $data['info']['similarity'],
+                        'description' => $data['info']['description'] ?? null,
+                        'img_url_db' => $imageUrl,
+                    ]);
+                } elseif ($data['source'] === 'Google Image') {
+                    // Lưu vào bảng painting_google
+                    PaintingGoogle::create([
+                        'title_gg' => $data['gemini_info']['title'] ?? null,
+                        'artist_gg' => $data['gemini_info']['artist'] ?? null,
+                        'style_gg' => $data['gemini_info']['style'] ?? null,
+                        'genre_gg' => $data['gemini_info']['genre'] ?? null,
+                        'year_gg' => $data['gemini_info']['year'] ?? null,
+                        'description_gg' => $data['gemini_info']['description'] ?? null,
+                        'artistic_features_gg' => $data['gemini_info']['artistic_features'] ?? null,
+                        'additional_info_gg' => $data['gemini_info']['additional_info'] ?? null,
+                        'img_url_gg' => $imageUrl,
+                    ]);
+                }
+
                 // Trả về kết quả cho người dùng
                 return response()->json($data);
             }
@@ -77,4 +112,6 @@ class PaintingController extends Controller
         }
     }
 }
+
+
 

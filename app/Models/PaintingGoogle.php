@@ -11,5 +11,16 @@ class PaintingGoogle extends Model
 
     protected $table = 'painting_google';
     protected $primaryKey = 'id_gg';
+    protected $fillable = [
+        'title_gg',
+        'artist_gg',
+        'style_gg',
+        'genre_gg',
+        'year_gg',
+        'description_gg',
+        'artistic_features_gg',
+        'additional_info_gg',
+        'img_url_gg',
+    ];
     public $timestamps = false;  // Assuming no timestamps in the table
 }
