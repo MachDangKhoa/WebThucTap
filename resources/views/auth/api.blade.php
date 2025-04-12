@@ -13,13 +13,13 @@
         <div class="collapse navbar-collapse justify-content-end">
             <ul class="navbar-nav">
                 <!-- Thống kê số lượt gọi API theo thời gian -->
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" href="{{ route('api_statistics') }}"><i class="fas fa-chart-line"></i>Statistics API</a>
-                </li>
+                </li> -->
                 <!-- Lấy top users gọi API nhiều nhất -->
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link" href="{{ route('api.top-users') }}"><i class="fas fa-users"></i> Top Users</a>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <form action="{{ route('logout') }}" method="POST">
                     @csrf
@@ -42,7 +42,7 @@
 
         <div class="card">
             <div class="card-header">
-                <h3>API Usage List</h3>
+                <h3 class="text-center">API Usage List</h3>
             </div>
             <div class="card-body">
                 <table class="table table-striped">

@@ -10,7 +10,7 @@
     <div class="container">
         <h1>Edit Painting Dataset</h1>
 
-        <form action="{{ route('painting.update', $painting->id_db) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('painting_db.update', $painting->id_db) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -38,11 +38,6 @@
                 <label for="similarity">Similarity</label>
                 <input type="text" class="form-control" id="similarity" name="similarity" value="{{ old('similarity', $painting->similarity) }}" disabled>
                 <small class="form-text text-muted">This field cannot be edited.</small>
-            </div>
-
-            <div class="form-group">
-                <label for="matched_file">Matched File</label>
-                <input type="text" class="form-control" id="matched_file" name="matched_file" value="{{ old('matched_file', $painting->matched_file) }}" required>
             </div>
 
             <div class="form-group">

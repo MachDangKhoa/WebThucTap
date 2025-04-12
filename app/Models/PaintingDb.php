@@ -12,6 +12,7 @@ class PaintingDb extends Model
     protected $table = 'painting_db';
     protected $primaryKey = 'id_db';
     protected $fillable = [
+        'account_id',
         'painting_title',
         'artist_db',
         'style_db',

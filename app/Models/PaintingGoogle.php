@@ -12,6 +12,7 @@ class PaintingGoogle extends Model
     protected $table = 'painting_google';
     protected $primaryKey = 'id_gg';
     protected $fillable = [
+        'accounts_id',
         'title_gg',
         'artist_gg',
         'style_gg',

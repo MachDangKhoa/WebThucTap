@@ -1,70 +1,113 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Dashboard - Hệ thống nhận diện tranh</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artwork Recognition</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; 
+        }
 
-    .navbar {
-      background-color: #1f2a3f;
-    }
+        .navbar {
+        background-color: #1f2a3f;
+        }
 
-    .navbar-brand {
-      font-weight: bold;
-      color: white;
-    }
+        .navbar-brand {
+        font-weight: bold;
+        color: white;
+        }
 
-    .navbar-brand:hover {
-      color: #1abc9c;
-    }
+        .navbar-brand:hover {
+        color: #1abc9c;
+        }
 
-    .navbar-nav .nav-link {
-      color: white;
-      margin-left: 10px;
-    }
+        .navbar-nav .nav-link {
+        color: white;
+        margin-left: 10px;
+        }
 
-    .navbar-nav .nav-link:hover {
-      color: #1abc9c;
-    }
+        .navbar-nav .nav-link:hover {
+        color: #1abc9c;
+        }
 
-    .main-content {
-      padding: 30px;
-    }
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 95px;
+            left: -250px;
+            width: 250px;
+            min-height: 100%;
+            background-color: #f5f5dc;
+            color: black;
+            padding-top: 20px;
+            overflow-y: auto;
+            z-index: 0;
+            transition: left 0.3s ease;
+        }
 
-    .card {
-      margin-bottom: 20px;
-    }
+        .sidebar a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            background-color: #f5f5dc;
+            transition: background-color 0.3s ease;
+        }
 
-    .footer {
-      background-color: #1f2a3f;
-      color: white;
-      text-align: center;
-      padding: 15px 0;
-    }
-  </style>
+        .sidebar a:hover {
+            background-color: #d4e157;
+            color: white;
+        }
+
+        .main-content {
+            padding: 30px;
+            margin-left: 0; /* Không margin trái khi sidebar ẩn */
+            transition: margin-left 0.3s ease;
+            flex: 1;
+        }
+
+        .card {
+            margin-bottom: 20px;
+        }
+
+        .dropdown-toggle::after {
+            display: none;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 999;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
 </head>
 <body>
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark px-4">
-  <a class="navbar-brand" href="#">🎨 Admin - Nhận diện tranh</a>
+  <a class="navbar-brand" href="{{ route('paintings.index') }}">🎨 Admin - Painting Identification</a>
   <div class="collapse navbar-collapse justify-content-end">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" href="{{ route('accounts.index') }}"><i class="fas fa-user"></i> Manage User</a>
+        <a class="nav-link" href="{{ route('predict') }}"><i class="fas fa-image"></i> Painting Identification</a>
       </li>
+
       <li class="nav-item">
-        <a class="nav-link" href="{{ route('api') }}"><i class="fas fa-chart-line"></i> API Usage</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{{ route('paintings.index') }}"><i class="fas fa-image"></i> Painting Information</a>
+        <a class="nav-link" href="{{ route('paintings.select') }}"><i class="fas fa-user"></i> Painting Information</a>
       </li>
 
       <li class="nav-item">
@@ -78,9 +121,24 @@
     </ul>
   </div>
 </nav>
+<div>
+    <button class="toggle-btn open-btn" id="open-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+    <button class="toggle-btn close-btn" id="close-btn">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <h3 class="text-center">Artwork Recognition</h3>
+        <a href="{{ route('predict') }}">Painting Identification</a>
+        <a href="#">Painting Information</a>
+    </div>
 
-<!-- Main Content -->
-<div class="container mt-4">
+    <!-- Main Content -->
+    <div class="container mt-4">
         <h3>Danh họa tiêu biểu</h3>
         <div class="row">
             <!-- Leonardo da Vinci -->
@@ -162,18 +220,25 @@
   
 </div>
 
-<!-- Footer -->
-<div class="footer mt-4">
-  <p>© 2025 Hệ Thống Nhận Diện Tranh - Admin</p>
-  <p><i class="fas fa-info-circle"></i> Thông tin hệ thống:</p>
-  <ul>
-    <li><strong>Phiên bản:</strong> 1.0</li>
-    <li><strong>Ngày phát hành:</strong> Tháng 5, 2025</li>
-    <li><strong>API:</strong> RESTful API, các endpoint chính: <code>/predict</code></li>
-    <li><strong>Liên kết tài liệu API:</strong> <a href="https://yourdomain.com/api-docs" target="_blank">Xem tài liệu API</a></li>
-  </ul>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let sidebarOpen = false;
 
+        document.getElementById('open-btn').addEventListener('click', function() {
+            sidebarOpen = true;
+            document.getElementById('sidebar').style.left = '0';
+            document.getElementById('main-content').style.marginLeft = '250px';
+            document.getElementById('open-btn').style.display = 'none';
+            document.getElementById('close-btn').style.display = 'block';
+        });
 
+        document.getElementById('close-btn').addEventListener('click', function() {
+            sidebarOpen = false;
+            document.getElementById('sidebar').style.left = '-250px';
+            document.getElementById('main-content').style.marginLeft = '0';
+            document.getElementById('open-btn').style.display = 'block';
+            document.getElementById('close-btn').style.display = 'none';
+        });
+    </script>
 </body>
 </html>

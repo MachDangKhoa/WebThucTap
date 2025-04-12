@@ -36,12 +36,12 @@
         @endif
 
         <div class="container">
-            <h1>Paintings List</h1>
 
-            <h2>Painting DB</h2>
+            <h1 class="text-center">Paintings Datasets</h1>
             <table class="table">
                 <thead>
                     <tr>
+                        <th>account_id</th>
                         <th>Title</th>
                         <th>Artist</th>
                         <th>Style</th>
@@ -52,13 +52,14 @@
                 <tbody>
                     @foreach ($paintingDb as $painting)
                     <tr>
+                        <td>{{ $painting->account_id }}</td>
                         <td>{{ $painting->painting_title }}</td>
                         <td>{{ $painting->artist_db }}</td>
                         <td>{{ $painting->style_db }}</td>
                         <td>{{ $painting->description }}</td>
                         <td>
-                            <a href="{{ route('painting.edit', $painting->id_db) }}" class="btn btn-warning">Edit</a>
-                            <form action="{{ route('painting.destroy', $painting->id_db) }}" method="POST" style="display:inline;">
+                            <a href="{{ route('painting.edit_db', $painting->id_db) }}" class="btn btn-warning">Edit</a>
+                            <form action="{{ route('painting.destroy_db', $painting->id_db) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">Delete</button>
@@ -69,10 +70,11 @@
                 </tbody>
             </table>
 
-            <h2>Painting Google</h2>
+            <h1 class="text-center">Paintings Google</h1>
             <table class="table">
                 <thead>
                     <tr>
+                        <th>accounts_id</th>
                         <th>Title</th>
                         <th>Artist</th>
                         <th>Style</th>
@@ -84,14 +86,15 @@
                 <tbody>
                     @foreach ($paintingGoogle as $painting)
                     <tr>
+                        <td>{{ $painting->accounts_id }}</td>
                         <td>{{ $painting->title_gg }}</td>
                         <td>{{ $painting->artist_gg }}</td>
                         <td>{{ $painting->style_gg }}</td>
                         <td>{{ $painting->year_gg }}</td>
                         <td>{{ $painting->description_gg }}</td>
                         <td>
-                            <a href="{{ route('paintinggoogle.edit', $painting->id_gg) }}" class="btn btn-warning">Edit</a>
-                            <form action="{{ route('paintinggoogle.destroy', $painting->id_gg) }}" method="POST" style="display:inline;">
+                            <a href="{{ route('painting.edit_gg', $painting->id_gg) }}" class="btn btn-warning">Edit</a>
+                            <form action="{{ route('painting.destroy_gg', $painting->id_gg) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">Delete</button>

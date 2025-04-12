@@ -17,6 +17,28 @@
             height: 100vh;
         }
 
+        .navbar {
+        background-color: #1f2a3f;
+        }
+
+        .navbar-brand {
+        font-weight: bold;
+        color: white;
+        }
+
+        .navbar-brand:hover {
+        color: #1abc9c;
+        }
+
+        .navbar-nav .nav-link {
+        color: white;
+        margin-left: 10px;
+        }
+
+        .navbar-nav .nav-link:hover {
+        color: #1abc9c;
+        }
+
         .container {
             background: #fff;
             border-radius: 8px;

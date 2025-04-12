@@ -10,7 +10,7 @@
     <div class="container">
         <h1>Edit Painting</h1>
 
-        <form action="{{ route('paintinggoogle.update', $painting->id_gg) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('painting_gg.update', $painting->id_gg) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 

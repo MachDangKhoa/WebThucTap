@@ -31,19 +31,17 @@ class PaintController extends Controller
             'style_db' => 'required|string|max:255',
             'photographer' => 'required|string|max:255',
             'similarity' => 'required|numeric',
-            'matched_file' => 'required|string|max:255',
             'description' => 'required|string',
             'img_url_db' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:10240',  // 10MB max
         ]);
 
         $painting = PaintingDb::findOrFail($id);
-
+        
         $painting->painting_title = $request->painting_title;
         $painting->artist_db = $request->artist_db;
         $painting->style_db = $request->style_db;
         $painting->photographer = $request->photographer;
         $painting->similarity = $request->similarity;
-        $painting->matched_file = $request->matched_file;
         $painting->description = $request->description;
 
         // Handling the image upload
@@ -69,7 +67,7 @@ class PaintController extends Controller
     public function edit_google($id)
     {
         $painting = PaintingGoogle::findOrFail($id);
-        return view('edit_painting', compact('painting'));
+        return view('paint.edit_gg', compact('painting'));
     }
 
     public function update_google(Request $request, $id)

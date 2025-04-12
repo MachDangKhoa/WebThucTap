@@ -54,3 +54,11 @@ Route::delete('/paintings/destroy_gg/{id}', [PaintController::class, 'destroy_go
 
 // Route API với middleware auth cho predict
 Route::match(['get', 'post'], '/predict', [PaintingController::class, 'predict'])->middleware('auth')->name('predict');
+
+Route::get('/paintings/redirect-detail', [PaintingController::class, 'redirectToDetail'])->name('paintings.view_detail_redirect');
+
+Route::get('/paintings/select', [PaintingController::class, 'showSelectionForm'])->name('paintings.select');
+
+Route::get('/paintings/detail/{type}/{id}', [PaintingController::class, 'viewDetail'])->name('paintings.view_detail');
+
+
