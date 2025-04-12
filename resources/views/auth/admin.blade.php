@@ -54,7 +54,7 @@
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark px-4">
-  <a class="navbar-brand" href="#">🎨 Admin - Nhận diện tranh</a>
+  <a class="navbar-brand" href="{{ route('admin.dashboard') }}">🎨 Admin - Nhận diện tranh</a>
   <div class="collapse navbar-collapse justify-content-end">
     <ul class="navbar-nav">
       <li class="nav-item">
@@ -66,6 +66,12 @@
       <li class="nav-item">
         <a class="nav-link" href="{{ route('paintings.index') }}"><i class="fas fa-image"></i> Painting Information</a>
       </li>
+
+      @if(Auth::check())
+      <li class="nav-item">
+        <span class="nav-link text-white">Xin chào, {{ Auth::user()->username }}</span>
+      </li>
+      @endif
 
       <li class="nav-item">
         <form action="{{ route('logout') }}" method="POST">

@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="container mt-4">
-        <h3>Edit Account</h3>
+        <h3 class="text-center">Account Infomation</h3>
         
         <form action="{{ route('accounts.update', $account->id) }}" method="POST" id="updateForm">
             @csrf
@@ -17,7 +17,7 @@
             <!-- Username -->
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" value="{{ $account->username }}" required>
+                <input type="text" class="form-control" id="username" name="username" value="{{ $account->username }}" disabled>
             </div>
 
             <!-- Password -->

@@ -99,7 +99,7 @@
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark px-4">
-  <a class="navbar-brand" href="{{ route('paintings.index') }}">🎨 Admin - Painting Identification</a>
+  <a class="navbar-brand" href="{{ route('dashboard') }}">🎨 Admin - Painting Identification</a>
   <div class="collapse navbar-collapse justify-content-end">
     <ul class="navbar-nav">
       <li class="nav-item">
@@ -109,6 +109,13 @@
       <li class="nav-item">
         <a class="nav-link" href="{{ route('paintings.select') }}"><i class="fas fa-user"></i> Painting Information</a>
       </li>
+      @if(Auth::check())
+      <li class="nav-item">
+        <a href="{{ route('account.edit', Auth::user()->id) }}" class="nav-link text-white">
+            Xin chào, {{ Auth::user()->username }}
+        </a>
+      </li>
+      @endif
 
       <li class="nav-item">
         <form action="{{ route('logout') }}" method="POST">
@@ -121,23 +128,25 @@
     </ul>
   </div>
 </nav>
-<div>
-    <button class="toggle-btn open-btn" id="open-btn">
+<!-- Toggle Buttons (sửa lại) -->
+<div style="position: fixed; top: 100px; left: 10px; z-index: 1001;">
+    <button class="toggle-btn open-btn btn btn-secondary" id="open-btn">
         <i class="fas fa-bars"></i>
     </button>
-    <button class="toggle-btn close-btn" id="close-btn">
+    <button class="toggle-btn close-btn btn btn-secondary" id="close-btn" style="display: none;">
         <i class="fas fa-times"></i>
     </button>
 </div>
-    
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <h3 class="text-center">Artwork Recognition</h3>
-        <a href="{{ route('predict') }}">Painting Identification</a>
-        <a href="#">Painting Information</a>
-    </div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <h3 class="text-center">Artwork Recognition</h3>
+    <a href="{{ route('predict') }}">Painting Identification</a>
+    <a href="{{ route('paintings.select') }}">Painting Information</a>
+</div>
 
     <!-- Main Content -->
+<div class="main-content" id="main-content">
     <div class="container mt-4">
         <h3>Danh họa tiêu biểu</h3>
         <div class="row">

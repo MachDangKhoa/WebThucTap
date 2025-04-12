@@ -83,7 +83,7 @@
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark px-4">
-  <a class="navbar-brand" href="#">🎨 Admin - Painting Identification</a>
+  <a class="navbar-brand" href="{{ route('dashboard') }}">🎨 Admin - Painting Identification</a>
   <div class="collapse navbar-collapse justify-content-end">
     <ul class="navbar-nav">
       <li class="nav-item">
@@ -107,7 +107,7 @@
 </nav>
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Danh sách tranh từ: {{ $source ?? 'Nguồn' }}</h2>
+    <h2 class="text-center mb-4">Danh sách tranh từ: {{ $source ?? 'nguồn' }}</h2>
 
 
     {{-- Thông báo lỗi --}}

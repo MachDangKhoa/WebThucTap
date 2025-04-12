@@ -26,6 +26,8 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
+        Auth::logout();  // Đăng xuất người dùng trước khi đăng nhập lại
+
         // Lấy thông tin đăng nhập
         $credentials = $request->only('username', 'password');
 
@@ -39,7 +41,7 @@ class LoginController extends Controller
             }
 
             // Nếu là người dùng bình thường
-            return view('auth.dashboard')->with('message', 'Đăng nhập thành công!');
+            return redirect()->route('dashboard')->with('message', 'Đăng nhập thành công!');
         }
 
         return back()->withErrors(['error' => 'Tên đăng nhập hoặc mật khẩu không chính xác, vui lòng nhập lại']);
@@ -83,7 +85,6 @@ class LoginController extends Controller
         // Quay lại với thông báo thành công
         return redirect()->route('login')->with('message', 'Đăng ký thành công! Vui lòng đăng nhập.');
     }
-
 
     public function logout()
     {
