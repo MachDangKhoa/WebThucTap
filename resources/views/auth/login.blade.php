@@ -30,6 +30,7 @@
             transform: translateY(100px);
             opacity: 0;
             animation: slideUp 0.6s ease-out forwards;
+            position: relative;
         }
         @keyframes slideUp {
             0% {
@@ -69,9 +70,24 @@
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
         .btn-custom:hover {
-            background-color: #28a745;
-            color: white;
-            transform: scale(1.05);
+            background-color: #0056b3;
+            transform: scale(1.02);
+        }
+        .btn-home {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: transparent;
+            border: none;
+            color: #333;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .btn-home:hover {
+            color: #007bff;
+            transform: scale(1.1);
         }
         .input-group-text {
             background: #f8f9fa;
@@ -116,10 +132,25 @@
         .input-group-text:hover i {
             transform: rotate(360deg);
         }
+        
+        /* Nút hiển thị mật khẩu */
+        #toggle-password {
+            border-radius: 0 8px 8px 0;
+            border-left: none;
+            transition: all 0.3s ease;
+        }
+        #toggle-password:hover {
+            background-color: #e9ecef;
+        }
     </style>
 </head>
 <body>
     <div class="login-container">
+        <!-- Nút Home -->
+        <a href="{{ route('home') }}" class="btn-home" title="Trang chủ">
+            <i class="fas fa-home"></i>
+        </a>
+
         <h2>Đăng nhập</h2>
 
         <!-- Display any success or error messages -->

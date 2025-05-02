@@ -245,6 +245,9 @@
             margin-bottom: 5px;
             
         }
+        .art-title:hover {
+            transform: scale(1.1);
+        }
 
         .art-artist {
             font-style: italic;
@@ -430,15 +433,15 @@
     <div class="collapse navbar-collapse justify-content-end">
         <ul class="navbar-nav">
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('predict') }}"><i class="fas fa-image"></i> Painting Identification</a>
+            <a class="nav-link" href="{{ route('predict') }}"><i class="fas fa-eye"></i> Painting Identification</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('paintings.select') }}"><i class="fas fa-user"></i> Painting Information</a>
+            <a class="nav-link" href="{{ route('paintings.select') }}"><i class="fas fa-image"></i> Painting Information</a>
         </li>
         @if(Auth::check())
         <li class="nav-item">
             <a href="{{ route('account.edit', Auth::user()->id) }}" class="nav-link">
-                Xin chào, {{ Auth::user()->username }}
+                <i class="fas fa-user"></i> Xin chào, {{ Auth::user()->username }}
             </a>
         </li>
         @endif
@@ -465,52 +468,42 @@
     <section class="gallery">
         <h2>Paintings Datasets</h2>
             <div class="art-gallery">
+            @foreach($paintingDb as $paintingDb)
                 <div class="art-piece">
-                    <img src="{{ asset('storage/uploads/Vincent.jpg') }}" alt="Vincent van Gogh">
+                    <img src="{{ $paintingDb->img_url_db}}">
                     <div class="art-info-container">
-                        <p class="art-title">Vincent van Gogh</p>
-                        <p class="art-artist">Danh họa người Hà Lan nổi tiếng với các tác phẩm như "Starry Night" và "Sunflowers".</p>
+                        <p class="art-title">{{$paintingDb->painting_title}}</p>
+                        <p class="art-artist">
+                            <strong>Họa sĩ:</strong> {{$paintingDb->artist_db}}<br>
+                            <strong>Phong cách:</strong> {{$paintingDb->style_db }}<br>
+                            <strong>Độ tương đồng:</strong> {{ $paintingDb->similarity }}<br>
+                            <strong>Nhiếp ảnh gia:</strong> {{ $paintingDb->photographer }}<br>
+                            <strong>Mô tả:</strong> {{ $paintingDb->description ?? 'Không có' }}<br>
+                        </p>
                     </div>
                 </div>
-                <div class="art-piece">
-                    <img src="{{ asset('storage/uploads/leonardo_da_vinci.jpg') }}" alt="Leonardo da Vinci">
-                    <div class="art-info-container">
-                        <p class="art-title">Leonardo da Vinci</p>
-                        <p class="art-artist">Một trong những danh họa nổi tiếng nhất của thời kỳ Phục Hưng, nổi bật với các tác phẩm như "Mona Lisa" và "The Last Supper". </p>
-                    </div>
-                </div>
-                <div class="art-piece">
-                    <img src="{{ asset('storage/uploads/pablo_picasso.jpg') }}" alt="Pablo Picasso">
-                    <div class="art-info-container">
-                        <p class="art-title">Pablo Picasso</p>
-                        <p class="art-artist">Một trong những nghệ sĩ vĩ đại nhất của thế kỷ 20, nổi bật với các phong cách như lập thể và các tác phẩm như "Guernica".</p>
-                    </div>
-                </div>
+            @endforeach
             </div>
 
-            <h2>Paintings Google</h2>
+        <h2>Paintings Google</h2>
             <div class="art-gallery">
+            @foreach($paintingGoogle as $painting)
                 <div class="art-piece">
-                    <img src="{{ asset('storage/uploads/Vincent.jpg') }}" alt="Vincent van Gogh">
+                    <img src="{{ $painting->img_url_gg}}">
                     <div class="art-info-container">
-                        <p class="art-title">Vincent van Gogh</p>
-                        <p class="art-artist">Danh họa người Hà Lan nổi tiếng với các tác phẩm như "Starry Night" và "Sunflowers".</p>
+                        <p class="art-title">{{$painting->title_gg}}</p>
+                        <p class="art-artist">
+                            <strong>Họa sĩ:</strong> {{$painting->artist_gg}}<br>
+                            <strong>Phong cách:</strong> {{$painting->style_gg }}<br>
+                            <strong>Thể loại:</strong> {{ $painting->genre_gg }}<br>
+                            <strong>Năm:</strong> {{ $painting->year_gg }}<br>
+                            <strong>Mô tả:</strong> {{ $painting->description_gg ?? 'Không có' }}<br>
+                            <strong>Đặc điểm nghệ thuật:</strong> {{ $painting->artistic_features_gg }}<br>
+                            <strong>Thông tin bổ sung:</strong> {{ $painting->additional_info_gg }}<br>
+                        </p>
                     </div>
                 </div>
-                <div class="art-piece">
-                    <img src="{{ asset('storage/uploads/leonardo_da_vinci.jpg') }}" alt="Leonardo da Vinci">
-                    <div class="art-info-container">
-                        <p class="art-title">Leonardo da Vinci</p>
-                        <p class="art-artist">Một trong những danh họa nổi tiếng nhất của thời kỳ Phục Hưng, nổi bật với các tác phẩm như "Mona Lisa" và "The Last Supper". </p>
-                    </div>
-                </div>
-                <div class="art-piece">
-                    <img src="{{ asset('storage/uploads/pablo_picasso.jpg') }}" alt="Pablo Picasso">
-                    <div class="art-info-container">
-                        <p class="art-title">Pablo Picasso</p>
-                        <p class="art-artist">Một trong những nghệ sĩ vĩ đại nhất của thế kỷ 20, nổi bật với các phong cách như lập thể và các tác phẩm như "Guernica".</p>
-                    </div>
-                </div>
+                @endforeach
             </div>
 
         <!-- Phong cách tranh nghệ thuật tiêu biểu -->
