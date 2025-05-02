@@ -5,13 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Admin Dashboard - API Usage</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        /* Navbar Style */
+        .navbar {
+        background: linear-gradient(90deg, #1f2a3f, #4c6e91);
+        padding: 15px 30px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+        font-weight: bold;
+        color: white;
+        font-size: 1.3rem;
+        letter-spacing: 1px;
+        transition: color 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+        color: #1abc9c;
+        transform: scale(1.1);
+        }
+
+        /* Navbar Menu */
+        .navbar-nav {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        }
+
+        .navbar-nav .nav-item {
+        margin-left: 20px;
+        }
+
+        .navbar-nav .nav-link {
+        color: white;
+        font-size: 1rem;
+        padding: 8px 15px;
+        transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+        color: #1abc9c;
+        transform: scale(1.1);
+        }
+
+        /* Active Link Style */
+        .navbar-nav .nav-item.active .nav-link {
+        color: #1abc9c;
+        font-weight: bold;
+        }
+
+        /* Dropdown Menu */
+        .navbar-nav .nav-item.dropdown .nav-link {
+        position: relative;
+        }
+
+        .navbar-nav .nav-item.dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        }    
+    </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="{{ route('admin.dashboard') }}">🎨 Admin - API Usage</a>
+        <a class="navbar-brand" href="{{ route('admin.dashboard') }}">🎨 Admin Art Paintings</a>
         <div class="collapse navbar-collapse justify-content-end">
             <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('api') }}"><i class="fas fa-users"></i> Manage Paintings</a>
+                </li>
                 <!-- Thống kê số lượt gọi API theo thời gian -->
                 <!-- <li class="nav-item">
                     <a class="nav-link" href="{{ route('api_statistics') }}"><i class="fas fa-chart-line"></i>Statistics API</a>

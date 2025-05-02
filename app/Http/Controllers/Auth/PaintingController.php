@@ -10,6 +10,14 @@ use App\Models\PaintingGoogle;  // Model cho bảng painting_google
 use App\Models\ApiUsageSummary;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @OA\Info(
+ *     title="API Painting Recognition",
+ *     version="1.0.0",
+ *     description="API allows users to upload an image of a painting for prediction using an external Flask API."
+ * )
+ */
+
 class PaintingController extends Controller
 {
     // Áp dụng middleware auth để kiểm tra xem người dùng đã đăng nhập hay chưa
@@ -84,6 +92,66 @@ class PaintingController extends Controller
 
         return view('auth.detail', compact('painting', 'image_url', 'source'))->with('paintings', collect());
     }
+
+    /**
+     * @OA\Post(
+     *     path="/predict",
+     *     summary="Predict a painting using a Flask API",
+     *     tags={"Paintings"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="image",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="The image file to be predicted"
+     *                 ),
+     *                 required={"image"}
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+    *         response=200,
+    *         description="Successful prediction",
+    *         @OA\JsonContent(
+    *             type="object",
+    *             @OA\Property(property="source", type="string", example="Dataset Cosine or Google Image"),
+    *             @OA\Property(
+    *                 property="result",
+    *                 type="object",
+    *                 oneOf={
+    *                     @OA\Schema(
+    *                         type="object",
+    *                         @OA\Property(property="painting_title", type="string"),
+    *                         @OA\Property(property="artist", type="string"),
+    *                         @OA\Property(property="style", type="string"),
+    *                         @OA\Property(property="similarity", type="number", example=0.85),
+    *                         @OA\Property(property="description", type="string"),
+    *                         @OA\Property(property="photographer", type="string")
+    *                     ),
+    *                     @OA\Schema(
+    *                         type="object",
+    *                         @OA\Property(property="title", type="string"),
+    *                         @OA\Property(property="artist", type="string"),
+    *                         @OA\Property(property="style", type="string"),
+    *                         @OA\Property(property="genre", type="string"),
+    *                         @OA\Property(property="year", type="string"),
+    *                         @OA\Property(property="description", type="string"),
+    *                         @OA\Property(property="artistic_features", type="string"),
+    *                         @OA\Property(property="additional_info", type="string")
+    *                     )
+    *                 }
+    *             )
+    *         )
+    *     ),
+     *     @OA\Response(response=400, description="Invalid image file provided"),
+     *     @OA\Response(response=500, description="Internal server error")
+     * )
+     */
+
 
     // Xử lý phương thức GET và POST cho dự đoán ảnh
     public function predict(Request $request)

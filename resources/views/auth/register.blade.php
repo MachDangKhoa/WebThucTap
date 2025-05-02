@@ -8,12 +8,32 @@
     <style>
     body {
         font-family: 'Arial', sans-serif;
-        background-color: #f1f1f1;
+        background: linear-gradient(135deg, #e0f7fa, #e3f2fd, #f1f8e9);
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
         margin: 0;
+    }
+    /* Vệt sáng blur background */
+    body::before, body::after {
+        content: '';
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 70%);
+        z-index: 0;
+        filter: blur(80px);
+    }
+
+    body::before {
+        top: -100px;
+        left: -100px;
+    }
+
+    body::after {
+        bottom: -100px;
+        right: -100px;
     }
 
     .container {
@@ -78,6 +98,26 @@
         margin-top: 15px;  /* Giảm margin-top */
     }
 
+    #back-floating-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        color: white;
+        padding: 10px 18px;
+        border-radius: 50px;
+        font-weight: bold;
+        text-decoration: none;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        z-index: 9999;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    #back-floating-button:hover {
+        background: linear-gradient(135deg, #11998e, #38ef7d);
+        transform: translateY(-3px);
+    }
+
     /* Mobile responsiveness */
     @media (max-width: 576px) {
         .container {
@@ -93,7 +133,9 @@
 
 </head>
 <body>
-
+<a href="{{ route('login') }}" onclick="goBack()" id="back-floating-button">
+    ← Quay lại
+</a>
 <div class="container">
     <h2>Đăng ký thành viên</h2>
     <form method="POST" action="{{ route('register') }}">
@@ -155,6 +197,11 @@
 
 
 </div>
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
 
 </body>
 </html>

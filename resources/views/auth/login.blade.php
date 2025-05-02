@@ -1,54 +1,127 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <title>Đăng nhập</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"/>
-    
     <style>
         body {
-            background-image: url('https://inkythuatso.com/uploads/thumbnails/800/2022/07/tranh-phong-canh-dong-que-viet-nam-dep-nhat-4-inkythuatso-20-11-07-41.jpg');
+            background-image: url('https://i.pinimg.com/736x/06/c8/e9/06c8e9198006cc2f00f3878fa6e8c341.jpg');
             background-size: cover;
             background-position: center;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-family: 'Roboto', sans-serif;
+            overflow: hidden;
         }
         .login-container {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.85);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             width: 350px;
             text-align: center;
+            backdrop-filter: blur(10px);
+            transform: translateY(100px);
+            opacity: 0;
+            animation: slideUp 0.6s ease-out forwards;
+        }
+        @keyframes slideUp {
+            0% {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
         .login-container h2 {
             margin-bottom: 20px;
+            font-size: 24px;
             color: #333;
+            font-weight: 600;
         }
         .form-control {
             margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-shadow: none;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
         }
         .btn-custom {
             width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-custom:hover {
+            background-color: #28a745;
+            color: white;
+            transform: scale(1.05);
         }
         .input-group-text {
             background: #f8f9fa;
-            border: 1px solid #ccc;
+            border-radius: 8px 0 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .input-group .form-control {
+            border-radius: 0 8px 8px 0;
         }
         .alert {
             margin-top: 10px;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: left;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        p {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        p a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        p a:hover {
+            text-decoration: underline;
+        }
+
+        /* Chuyển động cho các icon */
+        .input-group-text i {
+            transition: transform 0.3s ease;
+        }
+        .input-group-text:hover i {
+            transform: rotate(360deg);
         }
     </style>
 </head>
 <body>
     <div class="login-container">
         <h2>Đăng nhập</h2>
-        
+
         <!-- Display any success or error messages -->
         @if(session('message'))
             <div class="alert alert-success">
@@ -83,8 +156,8 @@
                 </button>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-custom">Đăng nhập</button>
-            <p class="mt-3">Chưa có tài khoản? <a href="{{ route('register') }}" class="text-primary">Đăng ký</a></p>
+            <button type="submit" class="btn btn-custom">Đăng nhập</button>
+            <p>Chưa có tài khoản? <a href="{{ route('register') }}">Đăng ký</a></p>
         </form>
     </div>
 

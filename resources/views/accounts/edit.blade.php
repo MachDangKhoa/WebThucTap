@@ -5,8 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Edit Account</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-</head>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">  
+
+    <style>
+        /* Navbar Style */
+        .navbar {
+            background: white;
+            padding: 15px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: white;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            color: #1abc9c;
+            transform: scale(1.1);
+        }
+        
+        /* Navbar Menu */
+        .navbar-nav {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-nav .nav-item {
+            margin-left: 20px;
+        }
+
+        .navbar-nav .nav-link {
+            color: white;
+            font-size: 1rem;
+            padding: 8px 15px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #1abc9c;
+            transform: scale(1.1);
+        }
+
+        /* Active Link Style */
+        .navbar-nav .nav-item.active .nav-link {
+            color: #1abc9c;
+            font-weight: bold;
+        }
+
+        /* Dropdown Menu */
+        .navbar-nav .nav-item.dropdown .nav-link {
+            position: relative;
+        }
+
+        .navbar-nav .nav-item.dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {           
+            .navbar {
+                padding: 10px 20px;
+            }
+
+            .navbar-nav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .navbar-nav .nav-item {
+                margin: 10px 0;
+            }
+
+            .navbar-nav .nav-link {
+                font-size: 1.2rem;
+            }
+
+            .navbar-brand {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
 <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light px-4" style="background-color: white;">
+        <a class="navbar-brand" href="{{ route('dashboard') }}">🎨Art Paintings Recognition</a>
+        <div class="collapse navbar-collapse justify-content-end">
+            <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('predict') }}"><i class="fas fa-image"></i> Painting Identification</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('paintings.select') }}"><i class="fas fa-user"></i> Painting Information</a>
+            </li>
+            @if(Auth::check())
+            <li class="nav-item">
+                <a href="{{ route('account.edit', Auth::user()->id) }}" class="nav-link">
+                    Xin chào, {{ Auth::user()->username }}
+                </a>
+            </li>
+            @endif
+            <li class="nav-item">
+                <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+                </form>
+            </li>
+            </ul>
+        </div>
+    </nav>
     <div class="container mt-4">
         <h3 class="text-center">Account Infomation</h3>
         

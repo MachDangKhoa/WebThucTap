@@ -8,10 +8,22 @@ use App\Http\Controllers\Auth\ApiUsageController;
 use App\Http\Controllers\Auth\AccountsController;
 use App\Http\Controllers\Auth\PaintController;
 use App\Http\Controllers\Auth\DashboardController;
+use App\Http\Controllers\WebsiteConfigController;
+use App\Http\Controllers\ApiConfigController;
+use App\Http\Controllers\PaintingModelController;
+
+use App\Models\WebsiteConfig;
+
+
+Route::get('/home', function () {
+    $config = WebsiteConfig::first(); 
+    return view('auth.home', compact('config'));
+})->name('home');
 
 // Route login/register
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('web');
+Route::post('/login', [LoginController::class, 'login'])->name('login.post')->middleware('web');
+
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 Route::get('/dashboard/edit/{id}', [AccountsController::class, 'edit'])->name('account.edit')->middleware('auth');;
@@ -24,7 +36,20 @@ Route::post('/register', [LoginController::class, 'register']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Route admin/dashboard với middleware auth và admin
-Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard')->middleware('auth');;
+Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard')->middleware('auth');
+
+Route::prefix('admin')->middleware('auth')->group(function () {
+    Route::get('website-config', [WebsiteConfigController::class, 'index'])->name('admin.website-config.index');
+    Route::post('website-config', [WebsiteConfigController::class, 'update'])->name('admin.website-config.update');
+});
+
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::resource('models', PaintingModelController::class);
+    Route::post('models/{id}/use', [PaintingModelController::class, 'use'])->name('models.use');
+
+});
+Route::get('admin/models', [PaintingModelController::class, 'index'])->name('admin.models.index');
+
 
 // // Route cho API Usage
 Route::get('/admin/api', [ApiUsageController::class, 'showApiUsage'])->name('api');
@@ -47,6 +72,9 @@ Route::put('/admin/accounts/{id}', [AccountsController::class, 'update'])->name(
 // Route để xóa tài khoản
 Route::delete('/admin/accounts/{id}', [AccountsController::class, 'destroy'])->name('accounts.destroy');
 
+Route::get('/admin/api-config', [APIConfigController::class, 'showForm'])->name('api.config.form');
+Route::post('/admin/api-config', [APIConfigController::class, 'storeOrUpdateConfig'])->name('api.config.storeOrUpdate');
+
 Route::get('/paintings', [PaintController::class, 'index'])->name('paintings.index');
 
 Route::get('/paintings/edit_db/{id}', [PaintController::class, 'edit_db'])->name('painting.edit_db');
@@ -61,7 +89,7 @@ Route::delete('/paintings/destroy_gg/{id}', [PaintController::class, 'destroy_go
 Route::match(['get', 'post'], '/predict', [PaintingController::class, 'predict'])->middleware('auth')->name('predict');
 
 Route::get('/paintings/redirect-detail', [PaintingController::class, 'redirectToDetail'])->name('paintings.view_detail_redirect');
-
+ 
 Route::get('/paintings/select', [PaintingController::class, 'showSelectionForm'])->name('paintings.select');
 
 Route::get('/paintings/detail/{type}/{id}', [PaintingController::class, 'viewDetail'])->name('paintings.view_detail');

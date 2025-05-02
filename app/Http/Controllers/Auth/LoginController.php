@@ -10,16 +10,19 @@ use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Account;
+use Illuminate\Support\Facades\Log;  // Thêm dòng này để sử dụng Log
 
 class LoginController extends Controller
 {
     public function showLoginForm()
     {
         return view('auth.login');
+
     }
 
     public function login(Request $request)
     {
+
         // Xác thực dữ liệu nhập vào
         $request->validate([
             'username' => 'required|string',
@@ -89,6 +92,6 @@ class LoginController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect()->route('login')->with('success', 'Bạn đã đăng xuất.');
+        return redirect()->route('home')->with('success', 'Bạn đã đăng xuất.');
     }
 }

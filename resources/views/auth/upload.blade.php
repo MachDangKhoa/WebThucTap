@@ -5,150 +5,220 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ Thống Nhận Diện Tranh</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f7fc;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+    body {
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(135deg, #f0f4f8, #d9e4f5, #fef6e4); /* Background sáng hơn */
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-x: hidden;
+        position: relative;
+    }
 
-        .navbar {
+    /* Tạo các vệt sáng ảo */
+    body::before, body::after {
+        content: '';
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 70%);
+        z-index: 0;
+        filter: blur(80px);
+    }
+    body::before {
+        top: -100px;
+        left: -100px;
+    }
+    body::after {
+        bottom: -100px;
+        right: -100px;
+    }
+
+    .navbar {
         background-color: #1f2a3f;
-        }
+        padding: 15px;
+        width: 100%;
+        z-index: 10;
+    }
 
-        .navbar-brand {
+    .navbar-brand, .navbar-nav .nav-link {
+        color: white;
+        transition: color 0.3s ease;
+    }
+
+    .navbar-brand:hover, .navbar-nav .nav-link:hover {
+        color: #1abc9c;
+    }
+
+    .container {
+        position: relative;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        padding: 40px;
+        max-width: 650px;
+        width: 90%;
+        margin: 50px auto;
+        transition: all 0.3s ease;
+    }
+
+    .container:hover {
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        transform: translateY(-5px);
+    }
+
+    h2 {
+        text-align: center;
+        font-size: 30px;
+        margin-bottom: 25px;
+        color: #34495e;
+        font-weight: 700;
+        text-shadow: 1px 1px 2px #e0e0e0;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 16px;
+        margin-bottom: 8px;
+        color: #555;
+    }
+
+    .form-group input[type="file"] {
+        width: 100%;
+        padding: 15px;
+        font-size: 16px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-group input[type="file"]:hover {
+        border-color: #007BFF;
+    }
+
+    .form-group input[type="submit"] {
+        width: 100%;
+        padding: 15px;
+        font-size: 18px;
+        border: none;
+        background: linear-gradient(135deg, #007BFF, #00c6ff);
+        color: white;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s ease;
+    }
+
+    .form-group input[type="submit"]:hover {
+        background: linear-gradient(135deg, #00b227, #00f260);
+        transform: translateY(-2px);
+    }
+
+    .loader {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .loader img {
+        width: 60px;
+        height: 60px;
+    }
+
+    #result {
+        margin-top: 30px;
+        background: #f8f8f8;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+    }
+
+    #uploaded-image {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    #uploaded-image img {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 10px;
+    }
+
+    #back-button {
+        margin-top: 20px;
+        padding: 12px;
+        font-size: 16px;
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    #back-button:hover {
+        background-color: #2ecc71;
+        transform: translateY(-2px);
+    }
+
+    pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .footer {
+        margin-top: 40px;
+        font-size: 14px;
+        color: #999;
+        text-align: center;
+    }
+
+    #back-floating-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background-color: #007bff;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 50px;
         font-weight: bold;
-        color: white;
-        }
+        text-decoration: none;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        z-index: 9999;
+        transition: background-color 0.3s, transform 0.3s;
+    }
 
-        .navbar-brand:hover {
-        color: #1abc9c;
-        }
+    #back-floating-button:hover {
+        background-color: #28a745;
+        transform: translateY(-2px);
+    }
 
-        .navbar-nav .nav-link {
-        color: white;
-        margin-left: 10px;
-        }
-
-        .navbar-nav .nav-link:hover {
-        color: #1abc9c;
-        }
-
+    @media (max-width: 768px) {
         .container {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
+            padding: 25px;
         }
-
         h2 {
-            text-align: center;
             font-size: 24px;
-            margin-bottom: 20px;
-            color: #333;
         }
-
-        .form-group {
-            margin-bottom: 30px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 16px;
-            margin-bottom: 8px;
-            color: #555;
-        }
-
-        .form-group input[type="file"] {
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            cursor: pointer;
-        }
-
-        .form-group input[type="file"]:hover {
-            border-color: #007BFF;
-        }
-
-        .form-group input[type="submit"] {
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            border: none;
-            background-color: #007BFF;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .form-group input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-
-        .loader {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .loader img {
-            width: 50px;
-            height: 50px;
-        }
-
-        /* Section to display results */
-        #result {
-            margin-top: 30px;
-            background-color: #f8f8f8;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-
-        #uploaded-image {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        #uploaded-image img {
-            max-width: 100%;
-            max-height: 400px;
-            border-radius: 8px;
-        }
-
-        #back-button {
-            margin-top: 20px;
-            padding: 12px;
-            font-size: 16px;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        #back-button:hover {
-            background-color:rgb(47, 211, 72);
-        }
-
-        pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
+    }
     </style>
+
 </head>
 <body>
+    <a href="{{ route('dashboard') }}" onclick="goBack()" id="back-floating-button">
+        ← Quay lại
+    </a>
     <div class="container">
         <h2>Hệ thống nhận diện tranh</h2>
         <form method="POST" enctype="multipart/form-data" action="{{ url('/predict') }}" id="predict-form">
@@ -222,7 +292,7 @@
                 }
                 // Nếu dữ liệu từ Dataset Cosine có thông tin
                 if (data.source === "Dataset Cosine") {
-                    const result = `
+                    const result = ` 
                         <h3>Tên Tranh: ${data.info.painting_title}</h3>
                         <p><strong>Tác giả:</strong> ${data.info.artist}</p>
                         <p><strong>Nhiếp ảnh:</strong> ${data.info.photographer}</p>
@@ -283,6 +353,10 @@
             backButton.style.display = 'none';
             imageInput.value = '';
         });
+
+        function goBack() {
+            window.history.back();
+        }
     </script>
 </body>
 </html>
