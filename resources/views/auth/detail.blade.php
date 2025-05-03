@@ -7,10 +7,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">  
-
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Bodoni Moda', cursive;
             background-color: #f4f4f9;
             margin: 0;
             padding: 0;
@@ -18,10 +18,44 @@
             flex-direction: column;
             min-height: 100vh;
         }
+         /* Header Styles */
+         header {
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px 0;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 700;
+            transition: color 0.3s ease, transform 0.3s ease;
+            padding: 10px 15px;
+        }
+
+        nav ul li a:hover {
+            color: #3498db;
+            transform: scale(1.1);
+        }
 
         /* Navbar Style */
         .navbar {
-            background: white
+            background: white;
+            padding: 15px 30px;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -168,15 +202,15 @@
     <div class="collapse navbar-collapse justify-content-end">
         <ul class="navbar-nav">
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('predict') }}"><i class="fas fa-image"></i> Painting Identification</a>
+            <a class="nav-link" href="{{ route('predict') }}"><i class="fas fa-eye"></i> Painting Identification</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('paintings.select') }}"><i class="fas fa-user"></i> Painting Information</a>
+            <a class="nav-link" href="{{ route('paintings.select') }}"><i class="fas fa-image"></i> Painting Information</a>
         </li>
         @if(Auth::check())
         <li class="nav-item">
             <a href="{{ route('account.edit', Auth::user()->id) }}" class="nav-link">
-                Xin chào, {{ Auth::user()->username }}
+                <i class="fas fa-user"></i> Xin chào, {{ Auth::user()->username }}
             </a>
         </li>
         @endif
@@ -255,24 +289,5 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    let sidebarOpen = false;
-
-    document.getElementById('open-btn').addEventListener('click', function() {
-        sidebarOpen = true;
-        document.getElementById('sidebar').style.left = '0';
-        document.getElementById('main-content').style.marginLeft = '250px';
-        document.getElementById('open-btn').style.display = 'none';
-        document.getElementById('close-btn').style.display = 'block';
-    });
-
-    document.getElementById('close-btn').addEventListener('click', function() {
-        sidebarOpen = false;
-        document.getElementById('sidebar').style.left = '-250px';
-        document.getElementById('main-content').style.marginLeft = '0';
-        document.getElementById('open-btn').style.display = 'block';
-        document.getElementById('close-btn').style.display = 'none';
-    });
-</script>
 </body>
 </html>

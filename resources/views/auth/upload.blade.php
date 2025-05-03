@@ -6,6 +6,8 @@
     <title>Hệ Thống Nhận Diện Tranh</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.3/dist/tailwind.min.css" rel="stylesheet">
+
     <style>
     body {
         font-family: 'Roboto', sans-serif;
@@ -215,10 +217,15 @@
     </style>
 
 </head>
-<body>
+<body class="min-h-screen bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100">
     <a href="{{ route('dashboard') }}" onclick="goBack()" id="back-floating-button">
         ← Quay lại
     </a>
+    <!-- Hiệu ứng Background Decor -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <div class="absolute bg-purple-300 opacity-30 rounded-full w-96 h-96 top-[-100px] left-[-100px] blur-3xl"></div>
+        <div class="absolute bg-pink-300 opacity-30 rounded-full w-96 h-96 bottom-[-100px] right-[-100px] blur-3xl"></div>
+    </div>
     <div class="container">
         <h2>Hệ thống nhận diện tranh</h2>
         <form method="POST" enctype="multipart/form-data" action="{{ url('/predict') }}" id="predict-form">
