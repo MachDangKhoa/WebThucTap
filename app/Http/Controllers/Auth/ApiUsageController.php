@@ -5,87 +5,99 @@ namespace App\Http\Controllers\Auth;
 use Carbon\Carbon;
 use App\Models\ApiUsageSummary;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+
 
 class ApiUsageController extends Controller
 {
+    // Hiển thị danh sách API usage với thống kê tổng quan
     public function showApiUsage()
     {
-        // Lấy danh sách tất cả API usage và truyền cho view
-        $apiUsages = ApiUsageSummary::all();
-        return view('auth.api', compact('apiUsages')); // Trả về view với danh sách API usages
+        // Thống kê tổng quan
+        $totalCallCount = ApiUsageSummary::sum('call_count');
+        $endpointCount = ApiUsageSummary::distinct('endpoint')->count('endpoint');
+        $activeUserCount = ApiUsageSummary::distinct('account_id')->count('account_id');
+        $todayCallCount = ApiUsageSummary::whereDate('last_called_at', today())->sum('call_count');
+        
+        // Dữ liệu cho biểu đồ
+        $endpoints = ApiUsageSummary::select('endpoint', DB::raw('SUM(call_count) as total_calls'))
+            ->groupBy('endpoint')
+            ->orderBy('total_calls', 'desc')
+            ->get();
+        
+        $endpointNames = $endpoints->pluck('endpoint');
+        $endpointCounts = $endpoints->pluck('total_calls');
+        
+        // Danh sách API usage
+        $apiUsages = ApiUsageSummary::with('user')
+            ->orderBy('last_called_at', 'desc')
+            ->paginate(15);
+
+        if (auth()->check() && auth()->user()->username === 'admin') {
+            return view('auth.api', compact(
+                'apiUsages',
+                'totalCallCount',
+                'endpointCount',
+                'activeUserCount',
+                'todayCallCount',
+                'endpointNames',
+                'endpointCounts'
+            ));
+        }
+        return redirect()->route('login')->withErrors(['error' => 'Bạn không có quyền truy cập trang admin.']);
+        
     }
 
-    // Hiển thị form chỉnh sửa API
-    public function edit_api($id)
+    // Hiển thị form chỉnh sửa API usage
+    public function edit($id)
     {
-        $apiUsage = ApiUsageSummary::find($id);
-        return view('auth.api_edit', compact('apiUsage')); // Trả về view với dữ liệu cần chỉnh sửa
+        $apiUsage = ApiUsageSummary::findOrFail($id);
+        return view('auth.api_edit', compact('apiUsage'));
     }
 
-    // Xử lý cập nhật dữ liệu API
-    public function update_api(Request $request, $id)
+    // Cập nhật API usage
+    public function update(Request $request, $id)
     {
-        // Validate dữ liệu từ form
-        $request->validate([
-            'endpoint' => 'required|string',
-            'call_count' => 'required|integer',
+        $validated = $request->validate([
+            'endpoint' => 'required|string|max:255',
+            'call_count' => 'required|integer|min:0',
+            'last_called_at' => 'nullable|date'
         ]);
 
-        // Tìm kiếm API Usage theo ID
-        $apiUsage = ApiUsageSummary::find($id);
+        $apiUsage = ApiUsageSummary::findOrFail($id);
+        $apiUsage->update($validated);
 
-        // Cập nhật dữ liệu
-        $apiUsage->endpoint = $request->input('endpoint');
-        $apiUsage->call_count = $request->input('call_count');
-        $apiUsage->last_called_at = now(); // Cập nhật thời gian
-        $apiUsage->save(); // Lưu lại thay đổi
-
-        // Redirect về trang chỉnh sửa với thông báo thành công
-        return redirect()->route('api', $apiUsage->id)->with('success', 'Account updated successfully!');
+        return redirect()->route('api.index')
+            ->with('success', 'API usage updated successfully');
     }
 
-    public function destroy_api($id)
+    // Xóa API usage
+    public function destroy($id)
     {
-        $account = ApiUsageSummary::find($id);
-        $account->delete();
-        return redirect()->route('api')->with('success', 'Account deleted successfully');
+        $apiUsage = ApiUsageSummary::findOrFail($id);
+        $apiUsage->delete();
+
+        return redirect()->route('api.index')
+            ->with('success', 'API usage deleted successfully');
     }
 
-    // Lấy thống kê số lượt gọi API theo thời gian (ngày, tuần, tháng)
-    public function getApiUsage(Request $request)
+   // Top users gọi API nhiều nhất
+    public function topUsers()
     {
-        $timePeriod = $request->input('time_period', 'day');
-        $startDate = Carbon::now();
-
-        if ($timePeriod == 'week') {
-            $startDate->startOfWeek();
-        } elseif ($timePeriod == 'month') {
-            $startDate->startOfMonth();
-        } else {
-            $startDate->startOfDay();
-        }
-
-        $apiUsageStats = ApiUsageSummary::where('last_called_at', '>=', $startDate)
-            ->selectRaw('DATE(last_called_at) as date, endpoint, SUM(call_count) as total_calls')
-            ->groupBy('date', 'endpoint')
-            ->orderBy('date', 'desc')
-            ->get();
-
-        return view('auth.api_statistics', compact('apiUsageStats'));
-    }
-
-    // Lấy top users gọi API nhiều nhất
-    public function getTopUsers(Request $request)
-    {
-        $topUsers = ApiUsageSummary::select('account_id', \DB::raw('SUM(call_count) as total_calls'))
+        $topUsers = ApiUsageSummary::with('user')
+            ->select([
+                'account_id',
+                DB::raw('SUM(call_count) as total_calls'),
+                DB::raw('COUNT(DISTINCT endpoint) as endpoints_used')
+            ])
             ->groupBy('account_id')
             ->orderBy('total_calls', 'desc')
-            ->limit(10) // Lấy 10 user gọi nhiều nhất
+            ->take(10)
             ->get();
-
-        return view('auth.api_top_users', compact('topUsers'));
-    }
-
-}
-
+        
+        if (auth()->check() && auth()->user()->username === 'admin') {
+            return view('auth.api_top_users', compact('topUsers'));
+        }
+        return redirect()->route('login')->withErrors(['error' => 'Bạn không có quyền truy cập trang admin.']);
+    }}

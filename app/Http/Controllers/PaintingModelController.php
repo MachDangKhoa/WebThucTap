@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PaintingModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class PaintingModelController extends Controller
 {
@@ -14,7 +15,11 @@ class PaintingModelController extends Controller
     public function index()
     {
         $models = PaintingModel::latest()->get();
-        return view('admin.index', compact('models'));
+        if (auth()->check() && auth()->user()->username === 'admin') {
+            return view('admin.index', compact('models'));
+        }
+        return redirect()->route('login')->withErrors(['error' => 'Bạn không có quyền truy cập trang admin.']);
+        
     }
 
     // Phương thức store để thêm model mới
@@ -30,18 +35,18 @@ class PaintingModelController extends Controller
        // Di chuyển file .txt vào thư mục public/storage/train_names
         $train_nameFile = $req->file('train_name');  // Đây là file .txt
         $train_nameFileName = $train_nameFile->getClientOriginalName();  // Lấy tên gốc của file .txt
-        $train_namePath = 'C:/xampp/htdocs/laravel_12/public/storage/train_names/' . $train_nameFileName;  // Đặt tên và đường dẫn tương đối cho file .txt
+        $train_namePath = 'D:/LuanVanTotNghiep/NhanDienThongTinTranh/data/' . $train_nameFileName;  // Đặt tên và đường dẫn tương đối cho file .txt
 
         // Di chuyển file vào thư mục public/storage/train_names
-        $train_nameFile->move(public_path('storage/train_names'), $train_nameFileName);
+        $train_nameFile->move(('D:/LuanVanTotNghiep/NhanDienThongTinTranh/data'), $train_nameFileName);
 
         // Di chuyển file model vào thư mục public/storage/models
         $modelFile = $req->file('model_file');  // Đây là file model
         $modelFileName = $modelFile->getClientOriginalName();  // Lấy tên gốc của file model
-        $modelFilePath = 'C:/xampp/htdocs/laravel_12/public/storage/models/' . $modelFileName;  // Đặt tên và đường dẫn tương đối cho file model
+        $modelFilePath = 'D:/LuanVanTotNghiep/NhanDienThongTinTranh/features/' . $modelFileName;  // Đặt tên và đường dẫn tương đối cho file model
 
         // Di chuyển file model vào thư mục public/storage/models
-        $modelFile->move(public_path('storage/models'), $modelFileName);
+        $modelFile->move(('D:/LuanVanTotNghiep/NhanDienThongTinTranh/features'), $modelFileName);
         // Lưu dữ liệu vào database
         PaintingModel::create([
             'name' => $req->name,
@@ -70,17 +75,31 @@ class PaintingModelController extends Controller
 
     // Phương thức destroy để xóa model
     public function destroy($id)
-    {
-        // Find and delete the model
-        PaintingModel::findOrFail($id)->delete();
+{
+    // Lấy model
+    $model = PaintingModel::findOrFail($id);
 
-        // Redirect back with success message
-        return redirect()->route('admin.models.index')->with('success', 'Đã xóa model.');
+    // Lấy đường dẫn từ các cột đã lưu trong DB
+    $trainNamePath = $model->name_train;
+    $modelFilePath = $model->model_path;
+
+    // Xóa file .txt nếu tồn tại
+    if (File::exists($trainNamePath)) {
+        File::delete($trainNamePath);
     }
 
-    // Phương thức để đánh dấu model "đang sử dụng"
-// 
+    // Xóa file model nếu tồn tại
+    if (File::exists($modelFilePath)) {
+        File::delete($modelFilePath);
+    }
 
+    // Xóa record khỏi database
+    $model->delete();
+
+    return redirect()->route('admin.models.index')->with('success', 'Đã xóa model và các file liên quan.');
+}
+
+// Phương thức để đánh dấu model "đang sử dụng"
 public function use($id)
 {
     // Tìm model theo ID

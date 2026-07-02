@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client;
 use App\Http\Controllers\Controller;
 use App\Models\PaintingDb;  // Model cho bảng painting_db
@@ -169,7 +170,7 @@ class PaintingController extends Controller
                 $client = new Client();
 
                 // Đường dẫn Flask API
-                $url = 'http://localhost:5000/predict';
+                $url = 'http://localhost:55020/predict';
 
                 // Gửi file ảnh tới Flask API
                 $response = $client->post($url, [
@@ -248,6 +249,272 @@ class PaintingController extends Controller
             }
 
             return response()->json(['error' => 'No valid image file provided'], 400);
+        }
+    }
+    // =============================================
+    // Các phương thức API cho mobile
+    // =============================================
+
+    /**
+     * API Nhận diện tranh (POST)
+     */
+    public function apiPredict(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|max:10240' // Max 10MB
+        ]);
+
+        if (!$request->hasFile('image')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No image provided'
+            ], 400);
+        }
+
+        $image = $request->file('image');
+        $client = new Client();
+        $url = 'http://localhost:55020/predict'; // Đảm bảo Flask API đang chạy tại đúng URL
+
+        try {
+            // Gửi yêu cầu đến Flask API
+            $response = $client->post($url, [
+                'timeout' => 300,
+                'multipart' => [
+                    [
+                        'name' => 'image',
+                        'contents' => fopen($image->getRealPath(), 'r'),
+                        'filename' => $image->getClientOriginalName()
+                    ]
+                ],
+            ]);
+
+            // Nhận kết quả từ Flask API
+            $data = json_decode($response->getBody()->getContents(), true);
+
+            // Ghi lại thông tin vào bảng api_usage_summary
+            $accountId = auth()->id();
+            $endpoint = 'api/predict';
+
+            $record = ApiUsageSummary::where('account_id', $accountId)
+                ->where('endpoint', $endpoint)
+                ->first();
+
+            if ($record) {
+                $record->increment('call_count');
+                $record->update(['last_called_at' => now()]);
+            } else {
+                ApiUsageSummary::create([
+                    'account_id' => $accountId,
+                    'endpoint' => $endpoint,
+                    'call_count' => 1,
+                    'last_called_at' => now()
+                ]);
+            }
+
+            // Lưu hình ảnh vào thư mục public/uploads và tạo URL
+            $imagePath = $image->store('uploads', 'public');
+            $imageUrl = Storage::url($imagePath);
+
+            // Lưu thông tin vào bảng tương ứng (painting_db hoặc painting_google)
+            if ($data['source'] === 'Dataset Cosine') {
+                PaintingDb::create([
+                    'account_id' => $accountId,
+                    'painting_title' => $data['info']['painting_title'],
+                    'artist_db' => $data['info']['artist'],
+                    'style_db' => $data['info']['style'],
+                    'photographer' => $data['info']['photographer'],
+                    'similarity' => $data['info']['similarity'],
+                    'description' => $data['info']['description'] ?? null,
+                    'img_url_db' => $imageUrl,
+                ]);
+            } elseif ($data['source'] === 'Google Image') {
+                PaintingGoogle::create([
+                    'accounts_id' => $accountId,
+                    'title_gg' => $data['gemini_info']['title'] ?? null,
+                    'artist_gg' => $data['gemini_info']['artist'] ?? null,
+                    'style_gg' => $data['gemini_info']['style'] ?? null,
+                    'genre_gg' => $data['gemini_info']['genre'] ?? null,
+                    'year_gg' => $data['gemini_info']['year'] ?? null,
+                    'description_gg' => $data['gemini_info']['description'] ?? null,
+                    'artistic_features_gg' => $data['gemini_info']['artistic_features'] ?? null,
+                    'additional_info_gg' => $data['gemini_info']['additional_info'] ?? null,
+                    'img_url_gg' => $imageUrl,
+                ]);
+            }
+
+            return response()->json($data); // Trả kết quả về cho người dùng
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Prediction failed: ' . $e->getMessage()
+            ], 500); // Log lỗi nếu có ngoại lệ
+        }
+    }
+
+
+    /**
+     * API Lấy danh sách kết quả (GET)
+     */
+    public function apiGetPredictions(Request $request)
+    {
+        $userId = Auth::id();
+        
+        $dbPaintings = PaintingDb::where('account_id', $userId)
+            ->orderBy('id_db', 'desc')
+            ->get(['id_db', 'painting_title', 'artist_db', 'img_url_db', 'created_at']);
+            
+        $googlePaintings = PaintingGoogle::where('accounts_id', $userId)
+            ->orderBy('id_gg', 'desc')
+            ->get(['id_gg', 'title_gg', 'artist_gg', 'img_url_gg', 'created_at']);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'db_paintings' => $dbPaintings,
+                'google_paintings' => $googlePaintings
+            ]
+        ]);
+    }
+
+    /**
+     * API Lọc kết quả theo loại (GET)
+     */
+    public function apiRedirectToDetail(Request $request)
+    {
+        $request->validate([
+            'type' => 'required|in:db,google'
+        ]);
+
+        $userId = Auth::id();
+        $type = $request->type;
+
+        if ($type === 'db') {
+            $paintings = PaintingDb::where('account_id', $userId)
+                ->orderBy('id_db', 'desc')
+                ->get()
+                ->map(function ($p) {
+                    return [
+                        'id' => $p->id_db,
+                        'title' => $p->painting_title,
+                        'artist' => $p->artist_db,
+                        'style' => $p->style_db,
+                        'similarity' => $p->similarity,
+                        'description' => $p->description,
+                        'image_url' => asset($p->img_url_db),
+                        'source' => 'Dataset Cosine'
+                    ];
+                });
+        } else {
+            $paintings = PaintingGoogle::where('accounts_id', $userId)
+                ->orderBy('id_gg', 'desc')
+                ->get()
+                ->map(function ($p) {
+                    return [
+                        'id' => $p->id_gg,
+                        'title' => $p->title_gg,
+                        'artist' => $p->artist_gg,
+                        'style' => $p->style_gg,
+                        'genre' => $p->genre_gg,
+                        'year' => $p->year_gg,
+                        'description' => $p->description_gg,
+                        'image_url' => asset($p->img_url_gg),
+                        'source' => 'Google Image'
+                    ];
+                });
+        }
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'type' => $type,
+                'paintings' => $paintings
+            ]
+        ]);
+    }
+
+    /**
+     * API Xem chi tiết kết quả (GET)
+     */
+    public function apiViewDetail($type, $id)
+    {
+        $userId = Auth::id();
+
+        if ($type === 'db') {
+            $painting = PaintingDb::where('id_db', $id)
+                ->where('account_id', $userId)
+                ->firstOrFail();
+                
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'type' => 'db',
+                    'painting' => $painting
+                ]
+            ]);
+        } 
+        
+        if ($type === 'google') {
+            $painting = PaintingGoogle::where('id_gg', $id)
+                ->where('accounts_id', $userId)
+                ->firstOrFail();
+                
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'type' => 'google',
+                    'painting' => $painting
+                ]
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid type'
+        ], 400);
+    }
+
+    // =============================================
+    // Các phương thức hỗ trợ
+    // =============================================
+
+    private function logApiUsage($accountId, $endpoint)
+    {
+        $record = ApiUsageSummary::firstOrNew([
+            'account_id' => $accountId,
+            'endpoint' => $endpoint
+        ]);
+
+        $record->call_count = $record->exists ? $record->call_count + 1 : 1;
+        $record->last_called_at = now();
+        $record->save();
+    }
+
+    private function savePredictionResult($accountId, $data, $imageUrl)
+    {
+        if ($data['source'] === 'Dataset Cosine') {
+            return PaintingDb::create([
+                'account_id' => $accountId,
+                'painting_title' => $data['info']['painting_title'],
+                'artist_db' => $data['info']['artist'],
+                'style_db' => $data['info']['style'],
+                'photographer' => $data['info']['photographer'],
+                'similarity' => $data['info']['similarity'],
+                'description' => $data['info']['description'] ?? null,
+                'img_url_db' => $imageUrl,
+            ]);
+        } else {
+            return PaintingGoogle::create([
+                'accounts_id' => $accountId,
+                'title_gg' => $data['gemini_info']['title'] ?? null,
+                'artist_gg' => $data['gemini_info']['artist'] ?? null,
+                'style_gg' => $data['gemini_info']['style'] ?? null,
+                'genre_gg' => $data['gemini_info']['genre'] ?? null,
+                'year_gg' => $data['gemini_info']['year'] ?? null,
+                'description_gg' => $data['gemini_info']['description'] ?? null,
+                'artistic_features_gg' => $data['gemini_info']['artistic_features'] ?? null,
+                'additional_info_gg' => $data['gemini_info']['additional_info'] ?? null,
+                'img_url_gg' => $imageUrl,
+            ]);
         }
     }
 }

@@ -1,200 +1,367 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Painting Models</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.3/dist/tailwind.min.css" rel="stylesheet">
+    <title>Quản lý Models - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        /* Smooth transition for all elements */
-        * {
-            transition: all 0.3s ease-in-out;
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; display: none; }
         }
-        
-        /* Table row hover effect */
-        tbody tr:hover {
-            background-color: #f0f9ff;
+        .fade-out {
+            animation: fadeOut 1.5s forwards;
         }
-
-        /* Input focus effect */
-        input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
-            outline: none;
+        .w-full.md\:w-64 {
+            flex: 0 0 16rem; /* Cố định width và không co giãn */
+            min-width: 16rem;
         }
-
-        /* Button hover scale effect */
-        button:hover {
+        .art-bg {
+            background: linear-gradient(135deg, rgba(30, 39, 46, 1) 0%, rgba(58, 85, 103, 1) 100%);
+        }
+        .sidebar-link:hover {
+            background-color: rgba(26, 188, 156, 0.2);
+            transform: translateX(5px);
+            transition: all 0.3s ease;
+        }
+        .sidebar-link.active {
+            background-color: #1abc9c;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .quick-action:hover {
             transform: scale(1.05);
-            background-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-
-        /* Alternate row color */
-        tbody tr:nth-child(even) {
+        tbody tr:hover {
             background-color: #f9fafb;
         }
-
-        /* Table header background */
-        thead {
-            background-color: #e0f2fe;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
-
-        /* Highlight active model */
-        .bg-green-50:hover {
-            background-color: #d1fae5;
+        .pulse:hover {
+            animation: pulse 1.5s infinite;
         }
-        #back-floating-button {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background-color: #007bff;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 50px;
-            font-weight: bold;
-            text-decoration: none;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            z-index: 9999;
-            transition: background-color 0.3s, transform 0.3s;
+        .model-active {
+            background-color: #f0fdf4;
+            border-left: 4px solid #10b981;
         }
-
-        #back-floating-button:hover {
-            background-color: #28a745;
-            transform: translateY(-2px);
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .file-input-button {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+            background-color: #f3f4f6;
+            cursor: pointer;
+        }
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
         }
     </style>
 </head>
+<body class="bg-gray-50 font-sans leading-normal tracking-normal">
 
-<body class="min-h-screen bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100">
-    <a href="{{ route('admin.dashboard') }}" onclick="goBack()" id="back-floating-button">
-        ← Quay lại
-    </a>
-    <div class="relative container mx-auto p-6">
-        <!-- Hiệu ứng Background Decor -->
-        <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-            <div class="absolute bg-purple-300 opacity-30 rounded-full w-96 h-96 top-[-100px] left-[-100px] blur-3xl"></div>
-            <div class="absolute bg-pink-300 opacity-30 rounded-full w-96 h-96 bottom-[-100px] right-[-100px] blur-3xl"></div>
+    @if (session('status'))
+        <div class="bg-green-500 text-white p-4 rounded-lg mb-4 flex items-center space-x-3 shadow-lg" id="status-message">
+            <i class="fas fa-check-circle text-xl animate-bounce"></i>
+            <span>{{ session('status') }}</span>
         </div>
+        <script>
+            setTimeout(() => document.getElementById('status-message').classList.add('fade-out'), 1500);
+        </script>
+    @endif
 
-        <div class="relative z-10"> <!-- Nội dung -->
-            <h2 class="text-4xl font-bold text-center text-blue-700 mb-8 drop-shadow-md">Manage Painting Models</h2>
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <!-- Sidebar -->
+        <div class="w-full md:w-64 art-bg text-white p-6 flex flex-col justify-between shadow-xl">
+            <div>
+                <h2 class="text-3xl font-semibold mb-8 text-center flex items-center justify-center">
+                    <span class="bg-white text-indigo-700 p-2 rounded-full mr-2">🎨</span> 
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
+                        Admin
+                    </span>
+                </h2>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="{{ route('admin.dashboard') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link pulse">
+                            <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('accounts.index') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link pulse">
+                            <i class="fas fa-users mr-3"></i> Quản lý người dùng
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('paintings.index') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link pulse">
+                            <i class="fas fa-image mr-3"></i> Quản lý tranh
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('api') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link pulse">
+                            <i class="fas fa-chart-line mr-3"></i> API Usage
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.website-config.index') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link pulse">
+                            <i class="fas fa-cogs mr-3"></i> Cấu hình website
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('api.config.form') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link pulse">
+                            <i class="fas fa-key mr-3"></i> Quản lý API Key
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.models.index') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link active pulse">
+                            <i class="fas fa-sliders-h mr-3"></i> Quản lý Models
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-            <!-- Form thêm model -->
-            <form action="{{ route('models.store') }}" method="POST" enctype="multipart/form-data" class="mb-8 bg-white p-6 rounded-xl shadow-xl">
-                @csrf
-                <div class="flex flex-wrap gap-4">
-                    <!-- Tên Model -->
-                    <div class="flex-1 min-w-[250px]">
-                        <label for="name" class="block text-sm font-medium text-gray-700">Model Name</label>
-                        <input type="text" id="name" name="name" placeholder="Enter model name" class="border p-2 w-full rounded focus:ring-2 focus:ring-blue-300" required>
+            <div class="mt-8">
+                @if(Auth::check())
+                <div class="text-center mb-4 text-gray-300 flex items-center justify-center">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center mr-3">
+                        <span class="text-white font-bold">{{ strtoupper(substr(Auth::user()->username, 0, 1)) }}</span>
                     </div>
-
-                    <!-- Chọn File .txt chứa tên phong cách kiến trúc -->
-                    <div class="flex-1 min-w-[250px]">
-                        <label for="train_name" class="block text-sm font-medium text-gray-700">Chọn file chứa tên phong cách kiến trúc</label>
-                        <input type="file" id="train_name" name="train_name" accept=".txt" class="border p-2 w-full rounded focus:ring-2 focus:ring-blue-300" required>
-                        <input type="text" id="trainNameFilePathTextbox" class="border p-2 mt-2 w-full rounded bg-gray-100" readonly>
-                    </div>
-
-                    <!-- Chọn File Model -->
-                    <div class="flex-1 min-w-[250px]">
-                        <label for="model_file" class="block text-sm font-medium text-gray-700">File model</label>
-                        <input type="file" id="model_file" name="model_file" class="border p-2 w-full rounded focus:ring-2 focus:ring-blue-300" required>
-                        <input type="text" id="modelFilePathTextbox" class="border p-2 mt-2 w-full rounded bg-gray-100" readonly>
-                    </div>
-
-                    <!-- Nút Submit -->
-                    <div class="flex items-end">
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded shadow-md">
-                            ➕ Thêm
-                        </button>
+                    <div>
+                        <p class="text-sm">Xin chào,</p>
+                        <p class="font-medium">{{ Auth::user()->username }}</p>
                     </div>
                 </div>
-            </form>
+                @endif
+                
+                <form id="logout" action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="block w-full py-3 px-4 text-white bg-red-500 hover:bg-red-600 rounded-lg text-center font-semibold transition duration-300 shadow-md hover:shadow-lg">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Đăng xuất
+                    </button>
+                </form>
+            </div>
+        </div>
 
-            <!-- Bảng danh sách -->
-            <div class="overflow-x-auto">
-                <table class="min-w-full bg-white shadow-md rounded-xl overflow-hidden">
-                    <thead class="bg-blue-100">
-                        <tr>
-                            <th class="px-4 py-3 text-left">id</th>
-                            <th class="px-4 py-3 text-left">Name</th>
-                            <th class="px-4 py-3 text-left">Paintings</th>
-                            <th class="px-4 py-3 text-left">Model</th>
-                            <th class="px-4 py-3 text-left">Status</th>
-                            <th class="px-4 py-3 text-left">Function</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($models as $i => $m)
-                            <tr class="{{ $m->is_active ? 'bg-green-50' : 'hover:bg-gray-100' }}">
-                                <td class="border px-4 py-2">{{ $i + 1 }}</td>
-                                <td class="border px-4 py-2">{{ $m->name }}</td>
-                                <td class="border px-4 py-2 text-sm">{{$m->name_train }}</td>
-                                <td class="border px-4 py-2 text-sm">{{ $m->model_path }}</td>
-                                <td class="border px-4 py-2">
-                                    @if($m->is_active)
-                                        <span class="text-green-600 font-semibold">Active</span>
-                                    @else
-                                        <span class="text-gray-500">—</span>
-                                    @endif
-                                </td>
-                                <td class="border px-4 py-2 space-x-1">
-                                    <form action="{{ route('models.update', $m->id) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('PUT')
-                                        <input type="text" name="name" value="{{ $m->name }}" class="border px-2 py-1 text-sm rounded">
-                                        <button class="text-blue-600 hover:text-blue-800">💾</button>
-                                    </form>
+        <!-- Main Content -->
+        <div class="flex-1 p-6 md:p-8">
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-500">
+                        Quản lý Models
+                    </span>
+                </h1>
+                <div class="text-sm text-gray-500 bg-white p-3 rounded-lg shadow-sm">
+                    <i class="fas fa-calendar-alt mr-2 text-blue-500"></i> 
+                    <span class="font-medium">{{ now()->format('d/m/Y') }}</span>
+                </div>
+            </div>
 
-                                    <form action="{{ route('models.destroy', $m->id) }}" method="POST" class="inline" onsubmit="return confirm('Xác nhận xóa?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="text-red-600 hover:text-red-800">🗑️</button>
-                                    </form>
+            @if(session('success'))
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <p>{{ session('success') }}</p>
+                    </div>
+                </div>
+            @endif
 
-                                    @unless($m->is_active)
-                                        <form action="{{ route('models.use', $m->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            <button class="text-green-600 hover:text-green-800">✅</button>
-                                        </form>
-                                    @endunless
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+            <!-- Form thêm model mới -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
+                        <i class="fas fa-plus-circle text-blue-500 mr-2"></i>
+                        Thêm Model mới
+                    </h3>
+                    
+                    <form action="{{ route('models.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="form-group">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tên Model</label>
+                                <input type="text" name="name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                       placeholder="Nhập tên model" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">File danh sách phong cách</label>
+                                <div class="file-input-wrapper">
+                                    <div class="file-input-button flex items-center justify-between">
+                                        <span class="truncate mr-2" id="train-file-name">Chọn file .txt</span>
+                                        <i class="fas fa-file-alt text-gray-500"></i>
+                                    </div>
+                                    <input type="file" id="train_name" name="train_name" class="file-input" accept=".txt" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">File Model</label>
+                                <div class="file-input-wrapper">
+                                    <div class="file-input-button flex items-center justify-between">
+                                        <span class="truncate mr-2" id="model-file-name">Chọn file model</span>
+                                        <i class="fas fa-file-upload text-gray-500"></i>
+                                    </div>
+                                    <input type="file" id="model_file" name="model_file" class="file-input" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 flex justify-end">
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition duration-300">
+                                <i class="fas fa-save mr-2"></i> Thêm Model
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Danh sách Models -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-semibold text-gray-800">
+                            <i class="fas fa-list text-blue-500 mr-2"></i>
+                            Danh sách Models
+                        </h3>
+                        <div class="text-sm text-gray-500">
+                            Tổng: {{ $models->count() }} models
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên Model</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File phong cách</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File Model</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach($models as $model)
+                                <tr class="{{ $model->is_active ? 'model-active' : 'hover:bg-gray-50' }} transition duration-150">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">{{ $model->name }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <span class="truncate max-w-xs inline-block">{{ $model->name_train }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <span class="truncate max-w-xs inline-block">{{ $model->model_path }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($model->is_active)
+                                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                <i class="fas fa-check-circle mr-1"></i> Đang hoạt động
+                                            </span>
+                                        @else
+                                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                Không hoạt động
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <div class="flex space-x-2">
+                                            @if(!$model->is_active)
+                                                <form action="{{ route('models.use', $model->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="text-green-600 hover:text-green-800" title="Kích hoạt model">
+                                                        <i class="fas fa-power-off"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            
+                                            <form action="{{ route('models.destroy', $model->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-800" onclick="return confirm('Bạn có chắc chắn muốn xóa model này?')" title="Xóa model">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="art-bg text-white py-4 px-6">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p class="text-sm">© 2025 Hệ Thống Nhận Diện Tranh - Admin</p>
+                    <p class="text-xs text-gray-300 mt-1">Phiên bản 1.0 - Tháng 5, 2025</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="/api/docs" target="_blank" class="text-sm hover:text-green-300 transition flex items-center">
+                        <i class="fas fa-book mr-1"></i> API Docs
+                    </a>
+                    <a href="#" class="text-sm hover:text-green-300 transition flex items-center">
+                        <i class="fas fa-question-circle mr-1"></i> Trợ giúp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script>
-        const PaintingFileInput = document.getElementById('train_name');
-        const modelFileInput = document.getElementById('model_file');
-        const PaintingFilePathTextbox = document.getElementById('trainNameFilePathTextbox');
-        const modelFilePathTextbox = document.getElementById('modelFilePathTextbox');
-
-        PaintingFileInput.addEventListener('change', function () {
-            const file = PaintingFileInput.files[0];
-            if (file) {
-                PaintingFilePathTextbox.value = file.name;
-            }
+        // Hiển thị tên file khi chọn
+        $('#train_name').change(function() {
+            const fileName = $(this).val().split('\\').pop();
+            $('#train-file-name').text(fileName || 'Chọn file .txt');
+        });
+        
+        $('#model_file').change(function() {
+            const fileName = $(this).val().split('\\').pop();
+            $('#model-file-name').text(fileName || 'Chọn file model');
         });
 
-        modelFileInput.addEventListener('change', function () {
-            const file = modelFileInput.files[0];
-            if (file) {
-                modelFilePathTextbox.value = file.name;
+        // Xử lý logout
+        $('#logout').on('submit', function(event) {
+            event.preventDefault();
+            if(confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    success: function() {
+                        window.location.href = "{{ route('home') }}";
+                    },
+                    error: function() {
+                        alert('Đăng xuất thất bại. Vui lòng thử lại.');
+                    }
+                });
             }
         });
-
-        function goBack() {
-            window.history.back();
-        }
     </script>
-
 </body>
-
-
 </html>

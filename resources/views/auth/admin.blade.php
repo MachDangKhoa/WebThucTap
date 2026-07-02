@@ -395,7 +395,7 @@
                     url: $(this).attr('action'),
                     data: $(this).serialize(),
                     success: function() {
-                        window.location.href = "{{ route('home') }}";
+                        window.location.href = "{{ route('login') }}";
                     },
                     error: function() {
                         alert('Đăng xuất thất bại. Vui lòng thử lại.');

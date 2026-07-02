@@ -28,8 +28,12 @@ class WebsiteConfigController extends Controller
                 'business_info' => 'Thông tin doanh nghiệp mặc định',
             ]);
         }
-    
-        return view('admin.website-config', compact('config'));
+
+        if (auth()->check() && auth()->user()->username === 'admin') {
+            return view('admin.website-config', compact('config'));
+        }
+        return redirect()->route('login')->withErrors(['error' => 'Bạn không có quyền truy cập trang admin.']);
+
     }
     public function update(Request $request)
     {

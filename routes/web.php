@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\ApiUsageController;
 use App\Http\Controllers\Auth\AccountsController;
 use App\Http\Controllers\Auth\PaintController;
 use App\Http\Controllers\Auth\DashboardController;
+use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\WebsiteConfigController;
 use App\Http\Controllers\ApiConfigController;
 use App\Http\Controllers\PaintingModelController;
@@ -21,13 +22,13 @@ Route::get('/home', function () {
 })->name('home');
 
 // Route login/register
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('web');
-Route::post('/login', [LoginController::class, 'login'])->name('login.post')->middleware('web');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
-Route::get('/dashboard/edit/{id}', [AccountsController::class, 'edit'])->name('account.edit')->middleware('auth');;
-Route::put('/dashboard/{id}', [AccountsController::class, 'update'])->name('account.update')->middleware('auth');;
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
+Route::get('/edit_user/{id}', [UserController::class, 'edit'])->name('user.edit')->middleware('auth');;
+Route::put('/{id}', [UserController::class, 'update_user'])->name('user.update')->middleware('auth');;
 
 Route::get('/register', [LoginController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [LoginController::class, 'register']);
@@ -54,13 +55,12 @@ Route::get('admin/models', [PaintingModelController::class, 'index'])->name('adm
 // // Route cho API Usage
 Route::get('/admin/api', [ApiUsageController::class, 'showApiUsage'])->name('api');
 
-Route::get('/admin/api/edit_api/{id}', [ApiUsageController::class, 'edit_api'])->name('api.edit_api');
+Route::get('/admin/api/edit_api/{id}', [ApiUsageController::class, 'edit'])->name('api.edit_api');
 Route::put('/admin/api/update_api/{id}', [ApiUsageController::class, 'update_api'])->name('api.update_api');
 
 Route::delete('/admin/api/{id}', [ApiUsageController::class, 'destroy_api'])->name('api.destroy_api');
 
-Route::get('/admin/api_statistics', [ApiUsageController::class, 'getApiUsage'])->name('api_statistics');
-Route::get('/admin/top-users', [ApiUsageController::class, 'getTopUsers'])->name('api.top-users');
+Route::get('/admin/top-users', [ApiUsageController::class, 'topUsers'])->name('api.top-users');
 
 // Route để hiển thị danh sách tài khoản
 Route::get('/admin/accounts', [AccountsController::class, 'index'])->name('accounts.index');
@@ -75,7 +75,7 @@ Route::delete('/admin/accounts/{id}', [AccountsController::class, 'destroy'])->n
 Route::get('/admin/api-config', [APIConfigController::class, 'showForm'])->name('api.config.form');
 Route::post('/admin/api-config', [APIConfigController::class, 'storeOrUpdateConfig'])->name('api.config.storeOrUpdate');
 
-Route::get('/paintings', [PaintController::class, 'index'])->name('paintings.index');
+Route::get('/admin/paintings', [PaintController::class, 'index'])->name('paintings.index');
 
 Route::get('/paintings/edit_db/{id}', [PaintController::class, 'edit_db'])->name('painting.edit_db');
 Route::put('/paintings/update_db/{id}', [PaintController::class, 'update_db'])->name('painting_db.update');
