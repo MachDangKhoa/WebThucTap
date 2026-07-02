@@ -368,11 +368,24 @@
             </a>
             <nav>
                 <ul>
-                    <!-- <li><a href="#">Artworks</a></li>
-                    <li><a href="#">Explore</a></li>
-                    <li><a href="#">About</a></li> -->
-                    <li><a href="{{ route('register') }}">Sign Up</a></li>
-                    <li><a href="{{ route('login.post') }}">Login</a></li>
+                    @auth
+                        <!-- Hiển thị khi đã đăng nhập -->
+                        @if(Auth::user()->username === 'admin')
+                            <!-- Menu dành cho admin -->
+                            <li><a href="{{ route('register') }}">Đăng ký</a></li>
+                            <li><a href="{{ route('admin.dashboard') }}">Đăng nhập</a></li>
+                        @else
+                            <!-- Menu dành cho user thường -->
+                            <li><a href="{{ route('register') }}">Đăng ký</a></li>
+                            <li><a href="{{ route('dashboard') }}">Đăng nhập</a></li>
+                        @endif
+                     @else
+                        <!-- <li><a href="#">Artworks</a></li>
+                        <li><a href="#">Explore</a></li>
+                        <li><a href="#">About</a></li> -->
+                        <li><a href="{{ route('register') }}">Đăng ký</a></li>
+                        <li><a href="{{ route('login.post') }}">Đăng nhập</a></li>
+                    @endauth
                 </ul>
             </nav>
         </div>
@@ -384,13 +397,13 @@
     <!-- Main Content Section -->
     <main>
         <section class="intro">
-            <h1>Discover New Art Every Day</h1>
-            <p>Browse thousands of artworks and learn about their history, meaning, and creators.</p>
-            <a href="/api/docs" class="btn-explore">Explore Art</a>
+            <h1>Khám phá nghệ thuật mới mỗi ngày</h1>
+            <p>Duyệt qua hàng ngàn tác phẩm nghệ thuật và tìm hiểu về lịch sử, ý nghĩa và tác giả của chúng.</p>
+            <a href="{{ route('login') }}" class="btn-explore">Khám phá nghệ thuật</a>
         </section>
 
         <section class="gallery">
-            <h2>Featured Artist</h2>
+            <h2>Nghệ sĩ nổi bật</h2>
                 <div class="art-gallery">
                     <div class="art-piece">
                         <img src="{{ asset('storage/uploads/Vincent.jpg') }}" alt="Vincent van Gogh">
@@ -415,7 +428,7 @@
                     </div>
                 </div>
 
-            <h2>Featured Artworks</h2>
+            <h2>Tác phẩm nghệ thuật nổi bật</h2>
             <div class="art-gallery">
                 <div class="art-piece">
                     <img src="{{ asset('storage/uploads/starry_night.jpg') }}" alt="The Starry Night">
@@ -464,7 +477,7 @@
 
             <!-- Phong cách tranh nghệ thuật tiêu biểu -->
             <div class="container">
-                <h2>Explore Art Movements</h2>
+                <h2>Phong cách tranh nghệ thuật tiêu biểu</h2>
                 
                 <div class="art-styles">
                     <!-- Ukiyo-e - Màu đỏ cam năng động -->

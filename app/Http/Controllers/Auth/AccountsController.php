@@ -12,14 +12,20 @@ class AccountsController extends Controller
     public function index()
     {
         $accounts = Account::all();
-        return view('accounts.index', compact('accounts'));
+        if (auth()->check() && auth()->user()->username === 'admin') {
+            return view('accounts.index', compact('accounts'));
+        }
+        return redirect()->route('login')->withErrors(['error' => 'Bạn không có quyền truy cập trang admin.']);
     }
 
     // Sửa tài khoản
     public function edit($id)
     {
         $account = Account::find($id);
-        return view('accounts.edit', compact('account'));
+        if (auth()->check() && auth()->user()->username === 'admin') {
+            return view('accounts.edit', compact('account'));
+        }
+        return redirect()->route('login')->withErrors(['error' => 'Bạn không có quyền truy cập trang admin.']);
     }
 
     // Cập nhật tài khoản
@@ -51,7 +57,17 @@ class AccountsController extends Controller
     public function destroy($id)
     {
         $account = Account::find($id);
+
+        if (!$account) {
+            return redirect()->route('accounts.index')->with('error', 'Account not found');
+        }
+
+        if ($account->username === 'admin') {
+            return redirect()->route('accounts.index')->with('error', 'Cannot delete admin account');
+        }
+
         $account->delete();
         return redirect()->route('accounts.index')->with('success', 'Account deleted successfully');
     }
+
 }

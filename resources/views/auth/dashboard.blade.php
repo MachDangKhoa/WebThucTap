@@ -27,6 +27,7 @@
             line-height: 1.6;
             overflow-x: hidden;
         }
+        
         /* Header Styles */
         header {
             background-color: #fff;
@@ -126,6 +127,70 @@
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
+        /* Navbar Toggle Button */
+        .navbar-toggler {
+            border: none;
+            padding: 0.5rem;
+            font-size: 1.25rem;
+            line-height: 1;
+            background-color: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-toggler:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            width: 1.5em;
+            height: 1.5em;
+        }
+
+        /* Mobile Menu Styles */
+        @media (max-width: 991.98px) {
+            .navbar-collapse {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background-color: white;
+                padding: 20px;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+                z-index: 999;
+                max-height: calc(100vh - 70px);
+                overflow-y: auto;
+            }
+            
+            .navbar-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-item {
+                margin-left: 0 !important;
+            }
+            
+            .nav-link {
+                padding: 10px 15px;
+                border-radius: 5px;
+                transition: all 0.3s ease;
+                display: block;
+            }
+            
+            .nav-link:hover {
+                background-color: #f8f9fa;
+            }
+            
+            .btn-danger {
+                width: 100%;
+                text-align: left;
+                padding: 10px 15px;
+                margin-top: 10px;
+            }
+        }
+
         /* Main Content Section */
         main {
             padding: 50px 20px;
@@ -203,8 +268,6 @@
             opacity: 0;
             animation: fadeIn 2s 1s forwards;
             transform: translateY(50px);
-            display: flex;
-            flex-direction: column;
         }
 
         .art-piece.visible {
@@ -218,45 +281,34 @@
 
         .art-piece img {
             width: 100%;
-            height: 100%; /* Cố định chiều cao */
-            object-fit: cover; /* Đảm bảo ảnh không bị méo */
-            border-radius: 10px 10px 0 0; /* Bo tròn góc trên */
+            height: 100%;
+            border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .art-info-container {
-            margin-top: 15px;
-            text-align: left;
-            padding: 15px;
-            background-color: black;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .art-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
             transition: transform 0.3s ease;
-            text-align: center;
         }
-        .art-info-container:hover {
+
+        .art-info:hover {
             transform: scale(1.1);
         }
 
         .art-title {
             font-weight: 700;
             font-size: 1.2rem;
-            color: white;
-            margin-bottom: 5px;
-            
-        }
-        .art-title:hover {
-            transform: scale(1.1);
         }
 
         .art-artist {
             font-style: italic;
             font-size: 1rem;
-            color: white;
-            transition: transform 0.3s ease;
-        }
-        .art-artist:hover {
-            transform: scale(1.1);
         }
 
         .container {
@@ -321,6 +373,7 @@
             opacity: 0.6;
             transform: translateX(-50%) translateY(-20%);
         }
+        
         
         h1 {
             text-align: center;
@@ -429,86 +482,125 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light px-4" style="background-color: white;">
-    <a class="navbar-brand" href="{{ route('dashboard') }}">🎨Art Paintings Recognition</a>
-    <div class="collapse navbar-collapse justify-content-end">
-        <ul class="navbar-nav">
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('predict') }}"><i class="fas fa-eye"></i> Painting Identification</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('paintings.select') }}"><i class="fas fa-image"></i> Painting Information</a>
-        </li>
-        @if(Auth::check())
-        <li class="nav-item">
-            <a href="{{ route('account.edit', Auth::user()->id) }}" class="nav-link">
-                <i class="fas fa-user"></i> Xin chào, {{ Auth::user()->username }}
-            </a>
-        </li>
-        @endif
-        <li class="nav-item">
-            <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit" class="btn btn-danger">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-            </form>
-        </li>
-        </ul>
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ route('dashboard') }}">🎨Art Paintings Recognition</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('predict') }}"><i class="fas fa-eye"></i> Nhận diện tranh</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('paintings.select') }}"><i class="fas fa-image"></i> Thông tin tranh</a>
+                </li>
+                @if(Auth::check())
+                <li class="nav-item">
+                    <a href="{{ route('user.edit', Auth::user()->id) }}" class="nav-link">
+                        <i class="fas fa-user"></i> Xin chào, {{ Auth::user()->username }}
+                    </a>
+                </li>
+                @endif
+                <li class="nav-item">
+                    <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
 <div class="parallax"></div>
 <!-- Main Content Section -->
 <main>
     <section class="intro">
-        <h1>Discover New Art Every Day</h1>
-        <p>Browse thousands of artworks and learn about their history, meaning, and creators.</p>
-        <a href="{{ route('predict') }}" class="btn-explore">Identification Paintings</a>
+        <h1>Khám phá nghệ thuật mới mỗi ngày</h1>
+        <p>Duyệt qua hàng ngàn tác phẩm nghệ thuật và tìm hiểu về lịch sử, ý nghĩa và tác giả của chúng.</p>
+        <a href="{{ route('login') }}" class="btn-explore">Khám phá nghệ thuật</a>
     </section>
 
     <section class="gallery">
-        <h2>Paintings Datasets</h2>
+        <h2>Nghệ sĩ nổi bật</h2>
             <div class="art-gallery">
-            @foreach($paintingDb as $paintingDb)
                 <div class="art-piece">
-                    <img src="{{ $paintingDb->img_url_db}}">
-                    <div class="art-info-container">
-                        <p class="art-title">{{$paintingDb->painting_title}}</p>
-                        <p class="art-artist">
-                            <strong>Họa sĩ:</strong> {{$paintingDb->artist_db}}<br>
-                            <strong>Phong cách:</strong> {{$paintingDb->style_db }}<br>
-                            <strong>Độ tương đồng:</strong> {{ $paintingDb->similarity }}<br>
-                            <strong>Nhiếp ảnh gia:</strong> {{ $paintingDb->photographer }}<br>
-                            <strong>Mô tả:</strong> {{ $paintingDb->description ?? 'Không có' }}<br>
-                        </p>
+                    <img src="{{ asset('storage/uploads/Vincent.jpg') }}" alt="Vincent van Gogh">
+                    <div class="art-info" style="left: 0px">
+                        <p class="art-title">Vincent van Gogh</p>
+                        <p class="art-artist">Danh họa người Hà Lan nổi tiếng với các tác phẩm như "Starry Night" và "Sunflowers".</p>
                     </div>
                 </div>
-            @endforeach
+                <div class="art-piece">
+                    <img src="{{ asset('storage/uploads/leonardo_da_vinci.jpg') }}" alt="Leonardo da Vinci">
+                    <div class="art-info" style="left: 0px">
+                        <p class="art-title">Leonardo da Vinci</p>
+                        <p class="art-artist">Một trong những danh họa nổi tiếng nhất của thời kỳ Phục Hưng, nổi bật với các tác phẩm như "Mona Lisa" và "The Last Supper". </p>
+                    </div>
+                </div>
+                <div class="art-piece">
+                    <img src="{{ asset('storage/uploads/pablo_picasso.jpg') }}" alt="Pablo Picasso">
+                    <div class="art-info" style="left: 0px">
+                        <p class="art-title">Pablo Picasso</p>
+                        <p class="art-artist">Một trong những nghệ sĩ vĩ đại nhất của thế kỷ 20, nổi bật với các phong cách như lập thể và các tác phẩm như "Guernica".</p>
+                    </div>
+                </div>
             </div>
 
-        <h2>Paintings Google</h2>
-            <div class="art-gallery">
-            @foreach($paintingGoogle as $painting)
-                <div class="art-piece">
-                    <img src="{{ $painting->img_url_gg}}">
-                    <div class="art-info-container">
-                        <p class="art-title">{{$painting->title_gg}}</p>
-                        <p class="art-artist">
-                            <strong>Họa sĩ:</strong> {{$painting->artist_gg}}<br>
-                            <strong>Phong cách:</strong> {{$painting->style_gg }}<br>
-                            <strong>Thể loại:</strong> {{ $painting->genre_gg }}<br>
-                            <strong>Năm:</strong> {{ $painting->year_gg }}<br>
-                            <strong>Mô tả:</strong> {{ $painting->description_gg ?? 'Không có' }}<br>
-                            <strong>Đặc điểm nghệ thuật:</strong> {{ $painting->artistic_features_gg }}<br>
-                            <strong>Thông tin bổ sung:</strong> {{ $painting->additional_info_gg }}<br>
-                        </p>
-                    </div>
+        <h2>Tác phẩm nghệ thuật nổi bật</h2>
+        <div class="art-gallery">
+            <div class="art-piece">
+                <img src="{{ asset('storage/uploads/starry_night.jpg') }}" alt="The Starry Night">
+                <div class="art-info">
+                    <p class="art-title">The Starry Night</p>
+                    <p class="art-artist">Vincent van Gogh</p>
                 </div>
-                @endforeach
             </div>
+            <div class="art-piece">
+                <img src="{{ asset('storage/uploads/mona_lisa.jpg') }}" alt="Mona Lisa">
+                <div class="art-info">
+                    <p class="art-title">Mona Lisa</p>
+                    <p class="art-artist">Leonardo da Vinci</p>
+                </div>
+            </div>
+            <div class="art-piece">
+                <img src="{{ url('storage/uploads/soup.jpg') }}" alt="The Soup">
+                <div class="art-info">
+                    <p class="art-title">The Soup</p>
+                    <p class="art-artist">Pablo Picasso</p>
+                </div>
+            </div>
+            <div class="art-piece">
+                <img src="{{ asset('storage/uploads/Irises.jpg') }}" alt="Irises">
+                <div class="art-info">
+                    <p class="art-title">Les Iris</p>
+                    <p class="art-artist">Vincent van Gogh</p>
+                </div>
+            </div>
+            <!-- Additional Artwork Pieces with External Images -->
+            <div class="art-piece">
+                <img src="{{ asset('storage/uploads/Adoration_of_the_magi.jpg') }}" alt="Adoration of the magi">
+                <div class="art-info">
+                    <p class="art-title">Adoration of the magi</p>
+                    <p class="art-artist">Leonardo da Vinci</p>
+                </div>
+            </div>
+            <div class="art-piece">
+                <img src="{{ url('storage/uploads/guernica.jpg') }}" alt="Guernica">
+                <div class="art-info">
+                    <p class="art-title">Guernica</p>
+                    <p class="art-artist">Pablo Picasso</p>
+                </div>
+            </div>
+        </div>
 
         <!-- Phong cách tranh nghệ thuật tiêu biểu -->
         <div class="container">
-            <h2>Explore Art Movements</h2>
+            <h2>Phong cách tranh nghệ thuật tiêu biểu</h2>
             
             <div class="art-styles">
                 <!-- Ukiyo-e - Màu đỏ cam năng động -->

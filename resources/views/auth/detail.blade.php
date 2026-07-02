@@ -18,40 +18,7 @@
             flex-direction: column;
             min-height: 100vh;
         }
-         /* Header Styles */
-         header {
-            background-color: #fff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px 0;
-        }
-
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 90%;
-            margin: 0 auto;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 30px;
-        }
-
-        nav ul li a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 700;
-            transition: color 0.3s ease, transform 0.3s ease;
-            padding: 10px 15px;
-        }
-
-        nav ul li a:hover {
-            color: #3498db;
-            transform: scale(1.1);
-        }
-
+        
         /* Navbar Style */
         .navbar {
             background: white;
@@ -64,7 +31,7 @@
 
         .navbar-brand {
             font-weight: bold;
-            color: white;
+            color: black;
             font-family: 'Dancing Script', cursive;
             font-size: 1.3rem;
             letter-spacing: 1px;
@@ -88,7 +55,7 @@
         }
 
         .navbar-nav .nav-link {
-            color: white;
+            color: black;
             font-size: 1rem;
             padding: 8px 15px;
             transition: color 0.3s ease, transform 0.3s ease;
@@ -105,16 +72,68 @@
             font-weight: bold;
         }
 
-        /* Dropdown Menu */
-        .navbar-nav .nav-item.dropdown .nav-link {
-            position: relative;
+        /* Navbar Toggle Button */
+        .navbar-toggler {
+            border: none;
+            padding: 0.5rem;
+            font-size: 1.25rem;
+            line-height: 1;
+            background-color: transparent;
+            transition: all 0.3s ease;
         }
 
-        .navbar-nav .nav-item.dropdown:hover .dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+        .navbar-toggler:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            width: 1.5em;
+            height: 1.5em;
+        }
+
+        /* Mobile Menu Styles */
+        @media (max-width: 991.98px) {
+            .navbar-collapse {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background-color: white;
+                padding: 20px;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+                z-index: 999;
+                max-height: calc(100vh - 70px);
+                overflow-y: auto;
+            }
+            
+            .navbar-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-item {
+                margin-left: 0 !important;
+            }
+            
+            .nav-link {
+                padding: 10px 15px;
+                border-radius: 5px;
+                transition: all 0.3s ease;
+                display: block;
+            }
+            
+            .nav-link:hover {
+                background-color: #f8f9fa;
+            }
+            
+            .btn-danger {
+                width: 100%;
+                text-align: left;
+                padding: 10px 15px;
+                margin-top: 10px;
+            }
         }
 
         .main-content {
@@ -126,6 +145,12 @@
 
         .card {
             margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
 
         /* Responsive Design */
@@ -141,31 +166,15 @@
 
             .main-content {
                 margin-left: 0;
+                padding: 15px;
             }
 
             .navbar {
                 padding: 10px 20px;
             }
 
-            .navbar-nav {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .navbar-nav .nav-item {
-                margin: 10px 0;
-            }
-
-            .navbar-nav .nav-link {
-                font-size: 1.2rem;
-            }
-
             .navbar-brand {
                 font-size: 1.3rem;
-            }
-
-            .toggle-btn {
-                display: block;
             }
 
             .card {
@@ -185,44 +194,67 @@
             }
         }
 
-        /* Button for toggling sidebar */
-        .toggle-btn {
-            position: fixed;
-            top: 100px;
-            left: 10px;
-            z-index: 1001;
+        /* Animation for cards */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
+        .card {
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+        .card:nth-child(5) { animation-delay: 0.5s; }
+        .card:nth-child(6) { animation-delay: 0.6s; }
     </style>
 </head>
 <body>
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light px-4" style="background-color: white;">
-    <a class="navbar-brand" href="{{ route('dashboard') }}">🎨Art Paintings Recognition</a>
-    <div class="collapse navbar-collapse justify-content-end">
-        <ul class="navbar-nav">
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('predict') }}"><i class="fas fa-eye"></i> Painting Identification</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('paintings.select') }}"><i class="fas fa-image"></i> Painting Information</a>
-        </li>
-        @if(Auth::check())
-        <li class="nav-item">
-            <a href="{{ route('account.edit', Auth::user()->id) }}" class="nav-link">
-                <i class="fas fa-user"></i> Xin chào, {{ Auth::user()->username }}
-            </a>
-        </li>
-        @endif
-        <li class="nav-item">
-            <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit" class="btn btn-danger">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-            </form>
-        </li>
-        </ul>
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ route('dashboard') }}">🎨Art Paintings Recognition</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('predict') }}"><i class="fas fa-eye"></i> Nhận diện tranh</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('paintings.select') }}"><i class="fas fa-image"></i> Thông tin tranh</a>
+                </li>
+                @if(Auth::check())
+                <li class="nav-item">
+                    <a href="{{ route('user.edit', Auth::user()->id) }}" class="nav-link">
+                        <i class="fas fa-user"></i> Xin chào, {{ Auth::user()->username }}
+                    </a>
+                </li>
+                @endif
+                <li class="nav-item">
+                    <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
 
@@ -289,5 +321,29 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
+    // Add animation to cards when they come into view
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.card');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                }
+            });
+        }, { threshold: 0.1 });
+
+        cards.forEach(card => {
+            observer.observe(card);
+        });
+    });
+</script>
 </body>
 </html>

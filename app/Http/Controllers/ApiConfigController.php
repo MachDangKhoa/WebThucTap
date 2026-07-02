@@ -12,7 +12,11 @@ class APIConfigController extends Controller
     {
         $config = APIConfig::first(); // Lấy dữ liệu cấu hình đầu tiên nếu có
 
-        return view('admin.form', compact('config'));
+        if (auth()->check() && auth()->user()->username === 'admin') {
+            return view('admin.form', compact('config'));
+        }
+        return redirect()->route('login')->withErrors(['error' => 'Bạn không có quyền truy cập trang admin.']);
+        
     }
 
     // Lưu hoặc cập nhật cấu hình LLM

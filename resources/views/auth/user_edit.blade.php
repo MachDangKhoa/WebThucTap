@@ -7,7 +7,137 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">  
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda&display=swap" rel="stylesheet">
     <style>
+        body {
+            font-family: 'Bodoni Moda', cursive;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        /* Navbar Style */
+        .navbar {
+            background: white;
+            padding: 15px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: black;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            color: #1abc9c;
+            transform: scale(1.1);
+        }
+        
+        /* Navbar Menu */
+        .navbar-nav {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-nav .nav-item {
+            margin-left: 20px;
+        }
+
+        .navbar-nav .nav-link {
+            color: black;
+            font-size: 1rem;
+            padding: 8px 15px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #1abc9c;
+            transform: scale(1.1);
+        }
+
+        /* Active Link Style */
+        .navbar-nav .nav-item.active .nav-link {
+            color: #1abc9c;
+            font-weight: bold;
+        }
+
+        /* Navbar Toggle Button */
+        .navbar-toggler {
+            border: none;
+            padding: 0.5rem;
+            font-size: 1.25rem;
+            line-height: 1;
+            background-color: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-toggler:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            width: 1.5em;
+            height: 1.5em;
+        }
+
+        /* Mobile Menu Styles */
+        @media (max-width: 991.98px) {
+            .navbar-collapse {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background-color: white;
+                padding: 20px;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+                z-index: 999;
+                max-height: calc(100vh - 70px);
+                overflow-y: auto;
+            }
+            
+            .navbar-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-item {
+                margin-left: 0 !important;
+            }
+            
+            .nav-link {
+                padding: 10px 15px;
+                border-radius: 5px;
+                transition: all 0.3s ease;
+                display: block;
+            }
+            
+            .nav-link:hover {
+                background-color: #f8f9fa;
+            }
+            
+            .btn-danger {
+                width: 100%;
+                text-align: left;
+                padding: 10px 15px;
+                margin-top: 10px;
+            }
+        }
         @keyframes fadeOut {
             from { opacity: 1; }
             to { opacity: 0; display: none; }
@@ -15,41 +145,12 @@
         .fade-out {
             animation: fadeOut 1.5s forwards;
         }
-        .sidebar-container {
-            width: 16rem;
-            min-width: 16rem;
-            flex-shrink: 0;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
-        }
         .main-content {
             flex-grow: 1;
             min-width: 0;
         }
-        @media (max-width: 768px) {
-            .flex {
-                flex-direction: column;
-            }
-            .sidebar-container {
-                width: 100%;
-                min-width: 100%;
-                height: auto;
-                position: relative;
-            }
-        }
         .art-bg {
             background: linear-gradient(135deg, rgba(30, 39, 46, 1) 0%, rgba(58, 85, 103, 1) 100%);
-        }
-        .sidebar-link:hover {
-            background-color: rgba(26, 188, 156, 0.2);
-            transform: translateX(5px);
-            transition: all 0.3s ease;
-        }
-        .sidebar-link.active {
-            background-color: #1abc9c;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .card-hover:hover {
             transform: translateY(-5px);
@@ -75,86 +176,41 @@
 </head>
 <body class="bg-gray-50 font-sans leading-normal tracking-normal">
 
-    @if (session('status'))
-        <div class="bg-green-500 text-white p-4 rounded-lg mb-4 flex items-center space-x-3 shadow-lg" id="status-message">
-            <i class="fas fa-check-circle text-xl animate-bounce"></i>
-            <span>{{ session('status') }}</span>
-        </div>
-        <script>
-            setTimeout(() => document.getElementById('status-message').classList.add('fade-out'), 1500);
-        </script>
-    @endif
-
-    <div class="flex">
-        <!-- Sidebar -->
-        <div class="sidebar-container art-bg text-white p-6 flex flex-col justify-between shadow-xl">
-            <div>
-                <h2 class="text-3xl font-semibold mb-8 text-center flex items-center justify-center">
-                    <span class="bg-white text-indigo-700 p-2 rounded-full mr-2">🎨</span> 
-                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
-                        Admin
-                    </span>
-                </h2>
-                <ul class="space-y-2">
-                    <li>
-                        <a href="{{ route('admin.dashboard') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link pulse">
-                            <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
+    <nav class="navbar navbar-expand-lg navbar-light px-4" style="background-color: white;">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ route('dashboard') }}">🎨Art Paintings Recognition</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('predict') }}"><i class="fas fa-eye"></i> Nhận diện tranh</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('paintings.select') }}"><i class="fas fa-image"></i> Thông tin tranh</a>
+                    </li>
+                    @if(Auth::check())
+                    <li class="nav-item">
+                        <a href="{{ route('user.edit', Auth::user()->id) }}" class="nav-link">
+                            <i class="fas fa-user"></i> Xin chào, {{ Auth::user()->username }}
                         </a>
                     </li>
-                    <li>
-                        <a href="{{ route('accounts.index') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link active pulse">
-                            <i class="fas fa-users mr-3"></i> Quản lý người dùng
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('paintings.index') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link pulse">
-                            <i class="fas fa-image mr-3"></i> Quản lý tranh
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('api') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link pulse">
-                            <i class="fas fa-chart-line mr-3"></i> API Usage
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.website-config.index') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link pulse">
-                            <i class="fas fa-cogs mr-3"></i> Cấu hình website
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('api.config.form') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link pulse">
-                            <i class="fas fa-key mr-3"></i> Quản lý API Key
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.models.index') }}" class="flex items-center py-3 px-4 rounded-lg sidebar-link pulse">
-                            <i class="fas fa-sliders-h mr-3"></i> Quản lý Models
-                        </a>
+                    @endif
+                    <li class="nav-item">
+                        <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </button>
+                        </form>
                     </li>
                 </ul>
             </div>
-
-            <div class="mt-8">
-                @if(Auth::check())
-                <div class="text-center mb-4 text-gray-300 flex items-center justify-center">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center mr-3">
-                        <span class="text-white font-bold">{{ strtoupper(substr(Auth::user()->username, 0, 1)) }}</span>
-                    </div>
-                    <div>
-                        <p class="text-sm">Xin chào,</p>
-                        <p class="font-medium">{{ Auth::user()->username }}</p>
-                    </div>
-                </div>
-                @endif
-                
-                <form id="logout" action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="block w-full py-3 px-4 text-white bg-red-500 hover:bg-red-600 rounded-lg text-center font-semibold transition duration-300 shadow-md hover:shadow-lg">
-                        <i class="fas fa-sign-out-alt mr-2"></i> Đăng xuất
-                    </button>
-                </form>
-            </div>
         </div>
+    </nav>
 
         <!-- Main Content -->
         <div class="main-content p-6 md:p-8">
@@ -200,7 +256,7 @@
             <!-- Form chỉnh sửa -->
             <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover transition duration-300">
                 <div class="p-6">
-                    <form action="{{ route('accounts.update', $account->id) }}" method="POST" id="updateForm">
+                    <form action="{{ route('user.update', $account->id) }}" method="POST" id="updateForm">
                         @csrf
                         @method('PUT')
 
@@ -263,7 +319,7 @@
                         </div>
 
                         <div class="mt-8 flex justify-end space-x-4 border-t pt-6">
-                            <a href="{{ route('accounts.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg transition duration-300 flex items-center">
+                            <a href="{{ route('dashboard') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg transition duration-300 flex items-center">
                                 <i class="fas fa-arrow-left mr-2"></i> Quay lại
                             </a>
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-300 flex items-center">

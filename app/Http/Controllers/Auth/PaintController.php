@@ -14,14 +14,21 @@ class PaintController extends Controller
     {
         $paintingDb = PaintingDb::all();
         $paintingGoogle = PaintingGoogle::all();
-        return view('paint.paintings', compact('paintingDb', 'paintingGoogle'));
+        if (auth()->check() && auth()->user()->username === 'admin') {
+            return view('paint.paintings', compact('paintingDb', 'paintingGoogle'));
+        }
+        return redirect()->route('login')->withErrors(['error' => 'Bạn không có quyền truy cập trang admin.']);
+
     }
 
     // Edit painting from PaintingDb
     public function edit_db($id)
     {
         $painting = PaintingDb::findOrFail($id);
-        return view('paint.edit_db', compact('painting'));
+        if (auth()->check() && auth()->user()->username === 'admin') {
+            return view('paint.edit_db', compact('painting'));
+        }
+        return redirect()->route('login')->withErrors(['error' => 'Bạn không có quyền truy cập trang admin.']);
     }
     public function update_db(Request $request, $id)
     {
@@ -67,7 +74,10 @@ class PaintController extends Controller
     public function edit_google($id)
     {
         $painting = PaintingGoogle::findOrFail($id);
-        return view('paint.edit_gg', compact('painting'));
+        if (auth()->check() && auth()->user()->username === 'admin') {
+            return view('paint.edit_gg', compact('painting'));
+        }
+        return redirect()->route('login')->withErrors(['error' => 'Bạn không có quyền truy cập trang admin.']);
     }
 
     public function update_google(Request $request, $id)

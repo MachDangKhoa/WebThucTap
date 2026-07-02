@@ -11,7 +11,7 @@
     <style>
     body {
         font-family: 'Roboto', sans-serif;
-        background: linear-gradient(135deg, #f0f4f8, #d9e4f5, #fef6e4); /* Background sáng hơn */
+        background: linear-gradient(135deg, #f0f4f8, #d9e4f5, #fef6e4);
         margin: 0;
         padding: 0;
         min-height: 100vh;
@@ -22,7 +22,6 @@
         position: relative;
     }
 
-    /* Tạo các vệt sáng ảo */
     body::before, body::after {
         content: '';
         position: absolute;
@@ -127,15 +126,23 @@
         transform: translateY(-2px);
     }
 
+    .form-group input[type="submit"]:disabled {
+        background: linear-gradient(135deg, #a0aec0, #c7d2fe);
+        cursor: not-allowed;
+        transform: none;
+    }
+
     .loader {
         display: none;
+        margin-left: auto;
+        margin-right: auto;
         text-align: center;
         margin-top: 20px;
     }
 
     .loader img {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
     }
 
     #result {
@@ -154,6 +161,8 @@
     #uploaded-image img {
         max-width: 100%;
         max-height: 400px;
+        margin-left: auto;
+        margin-right: auto;
         border-radius: 10px;
     }
 
@@ -206,6 +215,50 @@
         transform: translateY(-2px);
     }
 
+    .debate-toggle {
+        margin-top: 10px;
+        padding: 8px 15px;
+        font-size: 14px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .debate-toggle:hover {
+        background-color: #2980b9;
+    }
+
+    #debate-section {
+        display: none;
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #ecf0f1;
+        border-radius: 5px;
+        color: #2c3e50;
+        line-height: 1.6;
+    }
+
+    #debate-section h4 {
+        color: #e74c3c;
+        margin-bottom: 10px;
+    }
+
+    #debate-section p {
+        margin-bottom: 15px;
+    }
+
+    #debate-section ul {
+        margin-left: 20px;
+        margin-bottom: 15px;
+    }
+
+    #debate-section li {
+        margin-bottom: 8px;
+    }
+
     @media (max-width: 768px) {
         .container {
             padding: 25px;
@@ -235,12 +288,12 @@
                 <input type="file" name="image" accept="image/*" required id="image-input">
             </div>
             <div class="form-group">
-                <input type="submit" value="Nhận diện tranh">
+                <input type="submit" value="Nhận diện tranh" id="submit-button">
             </div>
         </form>
 
         <div class="loader" id="loader">
-            <img src="https://i.imgur.com/llF5iyg.gif" alt="Loading">
+            <img src="https://i.imgur.com/llF5iyg.gif" alt="Loading" style="display: block; margin: 0 auto;">
         </div>
 
         <!-- Uploaded Image Display -->
@@ -248,6 +301,10 @@
 
         <!-- Result Section -->
         <div id="result"></div>
+
+        <!-- Debate Section -->
+        <button class="debate-toggle" id="toggle-debate">Xem phần tranh luận</button>
+        <div id="debate-section"></div>
 
         <!-- Back Button -->
         <button id="back-button" style="display: none;">Chọn tranh khác</button>
@@ -265,6 +322,9 @@
         const uploadedImageContainer = document.getElementById('uploaded-image');
         const imageInput = document.getElementById('image-input');
         const backButton = document.getElementById('back-button');
+        const submitButton = document.getElementById('submit-button');
+        const debateToggle = document.getElementById('toggle-debate');
+        const debateSection = document.getElementById('debate-section');
 
         // Hiển thị ảnh trước khi gửi yêu cầu
         imageInput.addEventListener('change', function() {
@@ -278,9 +338,27 @@
             }
         });
 
+        const getValue = (value, defaultText = 'Không có thông tin') => value || defaultText;
+
+        const convertMarkdownToHtml = (text) => {
+            if (!text) return defaultText;
+            // Thay thế các tiêu đề Markdown (###, ####) và danh sách
+            let html = text
+                .replace(/^###\s+(.+)$/gm, '<h3>$1</h3>') // ### -> h3
+                .replace(/^####\s+(.+)$/gm, '<h4>$1</h4>') // #### -> h4
+                .replace(/^\*\s+(.+)$/gm, '<li>$1</li>') // Danh sách * -> li
+                .replace(/\n/g, '<br>'); // Xuống dòng -> <br>
+            // Bọc danh sách trong <ul> nếu có
+            html = html.replace(/(<li>.+<\/li>)/g, '<ul>$1</ul>');
+            return html;
+        };
+
         form.addEventListener('submit', function(e) {
             e.preventDefault(); // Ngừng submit mặc định
+            if (submitButton.disabled) return; // Ngăn gửi lại nếu nút đã vô hiệu hóa
+
             loader.style.display = 'block'; // Hiển thị loader
+            submitButton.disabled = true; // Vô hiệu hóa nút submit
 
             const formData = new FormData(form);
 
@@ -291,6 +369,7 @@
             .then(response => response.json())
             .then(data => {
                 loader.style.display = 'none'; // Ẩn loader sau khi nhận dữ liệu
+                submitButton.disabled = false; // Kích hoạt lại nút submit
 
                 // Kiểm tra lỗi nếu có
                 if (data.error) {
@@ -311,52 +390,95 @@
                 }
                 // Nếu dữ liệu từ Google Image và Gemini có thông tin
                 else if (data.source === "Google Image") {
-                    const geminiInfo = data.gemini_info;
+                    const agentDebate = data["Agent Debate"];
+                    const finalResult = agentDebate.final_result;
+                    const information = agentDebate.information;
+                    console.log("Data received:", data);
+                    console.log("Final Result:", finalResult);
 
                     // Tạo mô tả chi tiết nếu không có thông tin hợp lệ
                     const detailedDescription = `
                         Thông tin về bức tranh:\n
-                        1. Tên bức tranh: ${geminiInfo.title || 'Không có thông tin'}\n
-                        2. Tên nghệ sĩ: ${geminiInfo.artist || 'Không có thông tin'}\n
-                        3. Phong cách và đặc điểm nghệ thuật: ${geminiInfo.style || 'Không có thông tin'}\n
-                        4. Thể loại: ${geminiInfo.genre || 'Không có thông tin'}\n
-                        5. Năm sáng tác: ${geminiInfo.year || 'Không rõ'}\n
-                        6. Mô tả: ${geminiInfo.description || 'Không có mô tả'}\n
-                        7. Các đặc điểm nghệ thuật nổi bật: ${geminiInfo.artistic_features || 'Không có thông tin'}\n
-                        8. Thông tin bổ sung: ${geminiInfo.additional_info || 'Không có thông tin'}
+                        1. Tên bức tranh: ${finalResult?.title || 'Không có thông tin'}\n
+                        2. Tên nghệ sĩ: ${finalResult?.artist || 'Không có thông tin'}\n
+                        3. Phong cách và đặc điểm nghệ thuật: ${finalResult?.style || 'Không có thông tin'}\n
+                        4. Thể loại: ${finalResult?.genre || 'Không có thông tin'}\n
+                        5. Năm sáng tác: ${finalResult?.year || 'Không rõ'}\n
+                        6. Mô tả: ${finalResult?.description || 'Không có mô tả'}\n
+                        7. Các đặc điểm nghệ thuật nổi bật: ${finalResult?.artistic_features || 'Không có thông tin'}\n
+                        8. Thông tin bổ sung: ${finalResult?.additional_info || 'Không có thông tin'}\n
                     `;
 
                     // Kiểm tra nếu tất cả các trường đều là "Không có thông tin"
-                    if (Object.values(geminiInfo).every(value => value === "Không có thông tin" || !value)) {
-                        resultContainer.innerHTML = `<pre>${detailedDescription}</pre>`;
+                    if (!finalResult || Object.values(finalResult).every(value => value === "Không có thông tin" || !value)) {
+                        const extracted_info = `
+                            <h3>Thông tin bức tranh:</h3>
+                            <p><strong>Tên bức tranh:</strong> ${information.title || 'Không có thông tin'}</p>
+                            <p><strong>Tên nghệ sĩ:</strong> ${information.artist || 'Không có thông tin'}</p>
+                            <p><strong>Phong cách:</strong> ${information.style || 'Không có thông tin'}</p>
+                            <p><strong>Thể loại:</strong> ${information.genre || 'Không có thông tin'}</p>
+                            <p><strong>Năm sáng tác:</strong> ${information.year || 'Không rõ'}</p>
+                            <p><strong>Mô tả:</strong> ${information.description || 'Không có mô tả.'}</p>
+                            <p><strong>Các đặc điểm nghệ thuật nổi bật:</strong> ${information.artistic_features || 'Không có thông tin'}</p>
+                            <p><strong>Thông tin bổ sung:</strong> ${information.additional_info || 'Không có thông tin'}</p>
+                        `;
+                        resultContainer.innerHTML = extracted_info;
                     } else {
                         const result = `
-                            <h3>Thông tin từ tìm kiếm Google:</h3>
-                            <p><strong>Tên bức tranh:</strong> ${geminiInfo.title || 'Không có thông tin'}</p>
-                            <p><strong>Tên nghệ sĩ:</strong> ${geminiInfo.artist || 'Không có thông tin'}</p>
-                            <p><strong>Phong cách:</strong> ${geminiInfo.style || 'Không có thông tin'}</p>
-                            <p><strong>Thể loại:</strong> ${geminiInfo.genre || 'Không có thông tin'}</p>
-                            <p><strong>Năm sáng tác:</strong> ${geminiInfo.year || 'Không rõ'}</p>
-                            <p><strong>Mô tả:</strong> ${geminiInfo.description || 'Không có mô tả.'}</p>
-                            <p><strong>Các đặc điểm nghệ thuật nổi bật:</strong> ${geminiInfo.artistic_features || 'Không có thông tin'}</p>
-                            <p><strong>Thông tin bổ sung:</strong> ${geminiInfo.additional_info || 'Không có thông tin'}</p>
+                            <h3>Thông tin bức tranh:</h3>
+                            <p><strong>Tên bức tranh:</strong> ${finalResult.title || 'Không có thông tin'}</p>
+                            <p><strong>Tên nghệ sĩ:</strong> ${finalResult.artist || 'Không có thông tin'}</p>
+                            <p><strong>Phong cách:</strong> ${finalResult.style || 'Không có thông tin'}</p>
+                            <p><strong>Thể loại:</strong> ${finalResult.genre || 'Không có thông tin'}</p>
+                            <p><strong>Năm sáng tác:</strong> ${finalResult.year || 'Không rõ'}</p>
+                            <p><strong>Mô tả:</strong> ${finalResult.description || 'Không có mô tả.'}</p>
+                            <p><strong>Các đặc điểm nghệ thuật nổi bật:</strong> ${finalResult.artistic_features || 'Không có thông tin'}</p>
+                            <p><strong>Thông tin bổ sung:</strong> ${finalResult.additional_info || 'Không có thông tin'}</p>
                         `;
                         resultContainer.innerHTML = result;
+
+                        // Hiển thị phần tranh luận với định dạng dễ nhìn
+                        const renderDebateSection = (agentDebate, finalResult) => {
+                            return `
+                                <h4><strong>Phần tranh luận</strong></h4>
+                                <h5><strong>Lập luận từ Gemini:</strong></h5>
+                                <div>${convertMarkdownToHtml(agentDebate.gemini_debate || 'Không có lập luận từ Gemini.')}</div>
+                                <h5><strong>Lập luận từ ChatGPT:</strong></h5>
+                                <div>${convertMarkdownToHtml(agentDebate.chatgpt_debate || 'Không có lập luận từ ChatGPT.')}</div>
+                                <h5><strong>Lý do trọng tài chọn:</strong></h5>
+                                <p>${getValue(finalResult.arbitration_reason, 'Không có lý do trọng tài.')}</p>
+                            `;
+                        };
+
+                        debateSection.innerHTML = renderDebateSection(agentDebate, finalResult);
                     }
                 }
-
                 backButton.style.display = 'block'; // Hiển thị nút quay lại
             })
             .catch(error => {
-                loader.style.display = 'none';
+                loader.style.display = 'none'; // Ẩn loader khi lỗi
+                submitButton.disabled = false; // Kích hoạt lại nút submit
                 resultContainer.innerHTML = `<p style="color: red;">Đã có lỗi xảy ra. Vui lòng thử lại sau.</p>`;
                 console.error('Error:', error);
             });
         });
 
+        // Toggle hiển thị phần tranh luận
+        debateToggle.addEventListener('click', function() {
+            if (debateSection.style.display === 'none') {
+                debateSection.style.display = 'block';
+                debateToggle.textContent = 'Ẩn phần tranh luận';
+            } else {
+                debateSection.style.display = 'none';
+                debateToggle.textContent = 'Xem phần tranh luận';
+            }
+        });
+
         backButton.addEventListener('click', function() {
             resultContainer.innerHTML = '';
             uploadedImageContainer.innerHTML = '';
+            debateSection.style.display = 'none';
+            debateToggle.textContent = 'Xem phần tranh luận';
             backButton.style.display = 'none';
             imageInput.value = '';
         });

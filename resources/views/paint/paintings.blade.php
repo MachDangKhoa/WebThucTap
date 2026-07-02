@@ -15,6 +15,10 @@
         .fade-out {
             animation: fadeOut 1.5s forwards;
         }
+        .w-full.md\:w-64 {
+            flex: 0 0 16rem; /* Cố định width và không co giãn */
+            min-width: 16rem;
+        }
         .art-bg {
             background: linear-gradient(135deg, rgba(30, 39, 46, 1) 0%, rgba(58, 85, 103, 1) 100%);
         }

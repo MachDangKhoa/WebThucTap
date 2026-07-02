@@ -24,4 +24,9 @@ class ApiUsageSummary extends Model
 
     // Tùy chọn nếu bạn không muốn tự động quản lý timestamps (created_at, updated_at)
     public $timestamps = false; // Vì bảng của bạn không có cột created_at, updated_at
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'account_id');
+    }
 }
